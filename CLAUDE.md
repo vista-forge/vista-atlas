@@ -13,7 +13,14 @@ prerequisites, deep-link contract). Engine decision (P0, recorded there §11):
 native deps; wrap it behind the store interface. Data = the published vdocs
 `data-vN` release (index.db 322 MB + gold tree), sha256-verified, read-only,
 bound to the `v_*` read-contract views only — never the live lake, never the
-producer repo. **Org note:** non-waterline repo (no `m`/`v` layer artifact —
+producer repo. **CLEAN-ROOM RULE (owner directive): the predecessor
+(vdocs-web, `~/projects/vdocs-web`) is a behavioral reference, never a code
+source — do NOT port or adapt its Go/Svelte code.** UX parity is re-specified
+from its docs and behavior; its known bug classes become TDD test cases FIRST
+(the mis-nested extracted-table placeholder that silently collapsed tables;
+nav-chrome handling; CAS image-path rewriting). Everything here is written
+test-first against the published read contract, version-pinned, ts-ci gated.
+**Org note:** non-waterline repo (no `m`/`v` layer artifact —
 it never touches an engine); per-repo memory lives in `docs/memory/` per
 `~/vista-forge/CLAUDE.md`, and the org increment protocol applies.
 
