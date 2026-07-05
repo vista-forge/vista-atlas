@@ -1,7 +1,7 @@
 # Vista Atlas
 
 **A VSCode extension over the vdocs gold-corpus data release — what the VA
-documentation *says*.** The de-novo successor of vdocs-web, twinned with
+documentation *says*.** The de-novo successor of vdocs-web (and, with its twin, of the deleted vista-info-hub), twinned with
 [vista-compass](https://github.com/vista-forge/vista-compass) (what the system
 measurably *is*); the two cross-link through the vdocs↔vista-meta entity bridge.
 
