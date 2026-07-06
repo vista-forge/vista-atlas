@@ -28,6 +28,7 @@ const DOCS = [
     section: 'Infrastructure',
     pub_year: '2019',
     is_latest: 1,
+    bundle_path: 'XU/xu_8_0um_bundle',
     sections: [
       {
         section_id: 'XU/xu_8_0_um/intro',
@@ -175,6 +176,7 @@ describe('queries', () => {
       assert.equal(doc?.title, 'Kernel User Manual');
       assert.equal(doc?.section_count, 2);
       assert.ok(doc?.source_url);
+      assert.equal(doc?.bundle_path, 'XU/xu_8_0um_bundle');
     });
 
     it('returns undefined for a missing key', () => {

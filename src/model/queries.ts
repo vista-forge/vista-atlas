@@ -32,6 +32,7 @@ export interface DocumentDetail extends DocumentSummary {
   readonly patch_id: string | null;
   readonly group_key: string;
   readonly source_url: string;
+  readonly bundle_path: string;
   readonly word_count: number;
   readonly section_count: number;
 }
@@ -154,7 +155,7 @@ export function facetCounts(
 export function getDocument(store: Store, docKey: string): DocumentDetail | undefined {
   const row = store.get(
     `SELECT doc_key, title, app_code, app_name, doc_type, section, pub_year, is_latest,
-            version, patch_id, group_key, source_url, word_count, section_count
+            version, patch_id, group_key, source_url, bundle_path, word_count, section_count
      FROM v_documents WHERE doc_key = ?`,
     docKey,
   );
@@ -167,6 +168,7 @@ export function getDocument(store: Store, docKey: string): DocumentDetail | unde
     patch_id: row.patch_id === null ? null : str(row.patch_id),
     group_key: str(row.group_key),
     source_url: str(row.source_url),
+    bundle_path: str(row.bundle_path),
     word_count: num(row.word_count),
     section_count: num(row.section_count),
   };

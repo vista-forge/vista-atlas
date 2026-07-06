@@ -198,3 +198,35 @@ real-corpus hydration chain PASS.
 - Wiring the transforms into the reading surface (gold body.md via
   `bundle_path` + webview or enriched virtual markdown) — next.
 - Figure hydration proper — gated on rich-assets joining the release.
+
+## 2026-07-05 — reading surface hydrates: transforms wired end-to-end
+
+**Done:**
+
+- Measured first: the FTS chunks carry the constructs (2,866 table
+  placeholders, ~15k chrome lines, 245 boilerplate links, 1,048 image
+  refs across `v_chunks`), so the hydration chain applies directly to
+  chunk-reconstructed section text — no gold body slicing needed for
+  the interim surface.
+- `sectionMarkdown` now runs the full chain: chrome strip always;
+  tables + boilerplate hydrate through injectable `HydrationLoaders`;
+  CAS images resolve or degrade visibly. `makeGoldLoaders(goldRoot)`
+  supplies real loaders from the installed bundle's gold tree
+  (traversal-guarded, `_shared/`-scoped; corpus text is untrusted
+  input).
+- `bundle_path` joined the bound contract surface + `DocumentDetail`
+  (it keys doc-bundle sidecar loads).
+- Extension wiring: after data acquisition, a `gold/` directory next
+  to index.db (the installed-bundle layout) activates the loaders; a
+  bare-db dataPath (e.g. the dist staging copy) degrades gracefully to
+  links + notes. In-host smoke still green.
+
+**Smoke results:** 222 tests, statements 97.9%; `make check` green;
+`test:vscode` PASS.
+
+**Deferred:**
+
+- A dedicated webview reading pane (custom TOC, styling) — optional
+  polish now that the preview surface hydrates.
+- Figure hydration proper — still gated on rich-assets joining the
+  release (Track P-vdocs 3).

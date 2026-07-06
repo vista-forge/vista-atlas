@@ -49,7 +49,13 @@ export {
   stripNavChrome,
 } from './model/hydrate.js';
 export { childrenOf, facetDimensions, type LibraryNode } from './model/library.js';
-export { readingUriParts, sectionIdFromQuery, sectionMarkdown } from './model/reading.js';
+export { makeGoldLoaders } from './model/gold.js';
+export {
+  type HydrationLoaders,
+  readingUriParts,
+  sectionIdFromQuery,
+  sectionMarkdown,
+} from './model/reading.js';
 export {
   type DocumentDetail,
   type DocumentFacet,

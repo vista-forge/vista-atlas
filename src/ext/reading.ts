@@ -5,7 +5,12 @@
  */
 
 import * as vscode from 'vscode';
-import { readingUriParts, sectionIdFromQuery, sectionMarkdown } from '../model/reading.js';
+import {
+  type HydrationLoaders,
+  readingUriParts,
+  sectionIdFromQuery,
+  sectionMarkdown,
+} from '../model/reading.js';
 import type { Store } from '../store/engine.js';
 
 export const READING_SCHEME = 'vista-atlas';
@@ -16,7 +21,10 @@ export function readingUri(sectionId: string): vscode.Uri {
 }
 
 export class ReadingContentProvider implements vscode.TextDocumentContentProvider {
-  constructor(private readonly store: () => Store | undefined) {}
+  constructor(
+    private readonly store: () => Store | undefined,
+    private readonly loaders: () => HydrationLoaders,
+  ) {}
 
   provideTextDocumentContent(uri: vscode.Uri): string {
     const sectionId = sectionIdFromQuery(uri.query);
@@ -27,6 +35,9 @@ export class ReadingContentProvider implements vscode.TextDocumentContentProvide
     if (store === undefined) {
       return 'Vista Atlas: data release not loaded yet.';
     }
-    return sectionMarkdown(store, sectionId) ?? `Vista Atlas: unknown section ${sectionId}.`;
+    return (
+      sectionMarkdown(store, sectionId, this.loaders()) ??
+      `Vista Atlas: unknown section ${sectionId}.`
+    );
   }
 }

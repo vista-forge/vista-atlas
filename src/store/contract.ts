@@ -39,6 +39,7 @@ export const INDEX_DB_VIEWS: Readonly<Record<string, readonly string[]>> = {
     'is_latest',
     'pub_year',
     'source_url',
+    'bundle_path',
     'word_count',
     'section_count',
   ],

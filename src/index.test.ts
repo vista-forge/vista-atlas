@@ -51,6 +51,7 @@ describe('public API surface (atlas data layer)', () => {
     'csvToMarkdownTable',
     'hydrateTables',
     'hydrateBoilerplate',
+    'makeGoldLoaders',
     // twin-link contract v1
     'loadTwinLinkContract',
     'validatePayload',

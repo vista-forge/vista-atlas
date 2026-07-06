@@ -7,10 +7,13 @@
  * URI surface. Everything testable lives in src/model/ and src/store/.
  */
 
+import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import * as vscode from 'vscode';
+import { makeGoldLoaders } from '../model/gold.js';
 import { searchChunks } from '../model/queries.js';
+import type { HydrationLoaders } from '../model/reading.js';
 import { installDataRelease } from '../store/bundle.js';
 import { checkIndexDb } from '../store/contract.js';
 import { type Store, openStore } from '../store/engine.js';
@@ -24,6 +27,7 @@ const MANIFEST_ASSET = 'vdocs-data-v1.manifest.json';
 const READ_SCHEMA_VERSION = '1.5';
 
 let store: Store | undefined;
+let loaders: HydrationLoaders = {};
 let pins: { tag: string; corpus_content_hash: string } = { tag: '', corpus_content_hash: '' };
 
 function config(): vscode.WorkspaceConfiguration {
@@ -39,6 +43,8 @@ async function acquireDbPath(context: vscode.ExtensionContext): Promise<string> 
   if (override !== '') {
     return override.endsWith('.db') ? override : join(override, 'index.db');
   }
+  // No override: install (or re-verify) the bundle, whose extracted
+  // root carries the gold tree the hydration loaders read.
   const record = loadReleaseRecord(context.asAbsolutePath('contracts/releases/vdocs-data-v1.json'));
   const result = await vscode.window.withProgress(
     {
@@ -69,6 +75,8 @@ async function openData(
   const dbPath = await acquireDbPath(context);
   store?.close();
   store = openStore(dbPath);
+  const goldRoot = join(dirname(dbPath), 'gold');
+  loaders = existsSync(goldRoot) ? makeGoldLoaders(goldRoot) : {};
 
   const report = checkIndexDb(store, {
     readSchemaVersion: READ_SCHEMA_VERSION,
@@ -135,7 +143,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   context.subscriptions.push(
     vscode.workspace.registerTextDocumentContentProvider(
       READING_SCHEME,
-      new ReadingContentProvider(() => store),
+      new ReadingContentProvider(
+        () => store,
+        () => loaders,
+      ),
     ),
   );
 
