@@ -27,5 +27,14 @@ metadata:
   extraction (cross-repo, coordinator session; tracked in
   `docs/p2-atlas-mvp-tracker.md`).
 - **Rich bundles gap**: data-v1 marks `rich_assets`/`rich_tables`/`history_cas`
-  `excluded` — table/figure hydration is gated on Track P-vdocs 3 (producer
-  work), not on Atlas.
+  `excluded` — FIGURE hydration is gated on Track P-vdocs 3 (producer work).
+  But **table CSV sidecars DO ship** (inside the bundle's gold tree,
+  `<doc>/tables/*.csv`), so table hydration is not gated.
+- **Gold markdown grammar** (measured 2026-07-05, encoded in
+  `src/model/hydrate.ts` tests): table placeholder
+  `_[Table N (extracted to CSV)](tables/table-NN.csv)_`; boilerplate link
+  `_[<snippet> — shared boilerplate](_shared/boilerplate/bp-<id>.md)_` (em
+  dash); images are bare CAS refs `![alt](<sha256>.<ext>)`, sometimes inside
+  blockquotes with prose glued right after the `)`; nav chrome is standalone
+  `[↑ Back to Contents](#contents)` lines; `v_documents.bundle_path` maps to
+  `gold/consolidated/<bundle_path>/body.md`.

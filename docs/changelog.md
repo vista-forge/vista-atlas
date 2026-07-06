@@ -161,3 +161,39 @@ six months. Don't summarise diffs — the diff is the diff. Focus on
 - Hydrating reading-pane webview + the predecessor bug-class transforms
   (mis-nested table placeholder, nav chrome, CAS image paths).
 - vsix packaging + GitHub release of the extension.
+
+## 2026-07-05 — hydration transforms: the predecessor bug classes, red-first
+
+**Done:**
+
+- `src/model/hydrate.ts` — the reading pane's engine as pure
+  (text, loader) functions, every predecessor bug class encoded as a
+  failing test before the code existed (clean-room principle 8):
+  - **mis-nested table placeholder** (THE vdocs-web bug that silently
+    collapsed tables): `_[Table N (extracted to CSV)](tables/…csv)_`
+    hydrates into a pipe table; a blockquote-nested placeholder keeps
+    every generated row inside the quote; a missing sidecar keeps the
+    visible link. Nothing is ever dropped.
+  - **CAS image paths**: `![alt](<sha256>.<ext>)` rewrites through a
+    resolver; unresolved refs become a visible "figure unavailable"
+    note, never a broken image (rich-assets are still excluded from
+    data-v1).
+  - **nav chrome**: standalone `[↑ Back to Contents](#contents)` lines
+    strip (P-vdocs 2 consumer workaround); inline mentions survive.
+  - plus `splitFrontmatter`, a minimal CSV parser (quoted fields, ""
+    escapes, CRLF), `csvToMarkdownTable` (pipe-escaped, row-capped),
+    and `hydrateBoilerplate` (`_shared/boilerplate` links inline as
+    attributed quotes; unavailable → link kept).
+- Real-corpus validation folded into the bundle integration test: the
+  PXRM user-manual gold bundle extracts from the actual release
+  tar.gz, its frontmatter splits, chrome strips, a real CSV sidecar
+  becomes a pipe table, and every CAS ref degrades visibly.
+
+**Smoke results:** 212 tests, statements 98.0%; `make check` green;
+real-corpus hydration chain PASS.
+
+**Deferred:**
+
+- Wiring the transforms into the reading surface (gold body.md via
+  `bundle_path` + webview or enriched virtual markdown) — next.
+- Figure hydration proper — gated on rich-assets joining the release.

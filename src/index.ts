@@ -39,6 +39,15 @@ export {
 } from './store/release.js';
 export { type ExtractOptions, extractTarGz, type TarEntry } from './store/tar.js';
 export { type ExpectedFile, sha256File, verifyFile, type VerifyResult } from './store/verify.js';
+export {
+  csvToMarkdownTable,
+  hydrateBoilerplate,
+  hydrateTables,
+  parseCsv,
+  rewriteImages,
+  splitFrontmatter,
+  stripNavChrome,
+} from './model/hydrate.js';
 export { childrenOf, facetDimensions, type LibraryNode } from './model/library.js';
 export { readingUriParts, sectionIdFromQuery, sectionMarkdown } from './model/reading.js';
 export {

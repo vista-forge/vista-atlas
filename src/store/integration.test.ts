@@ -2,6 +2,12 @@ import { strict as assert } from 'node:assert';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
+import {
+  hydrateTables,
+  rewriteImages,
+  splitFrontmatter,
+  stripNavChrome,
+} from '../model/hydrate.ts';
 import { facetCounts, getDocument, searchChunks, sectionText } from '../model/queries.ts';
 import { checkIndexDb } from './contract.ts';
 import { openStore } from './engine.ts';
@@ -90,16 +96,41 @@ describe('the real vdocs data-v1 release', () => {
       const { mkdtempSync, rmSync } = await import('node:fs');
       const { tmpdir } = await import('node:os');
       const dest = mkdtempSync(join(tmpdir(), 'atlas-real-tar-'));
+      const SAMPLE_DOC = 'vdocs-data-v1/gold/consolidated/PXRM/pxrm_um/';
       try {
         const wanted = new Set(small.map(([name]) => `vdocs-data-v1/gold/${name}`));
         const entries = await extractTarGz(REAL_BUNDLE, dest, {
-          filter: (path) => wanted.has(path),
+          filter: (path) => wanted.has(path) || path.startsWith(SAMPLE_DOC),
         });
-        assert.equal(entries.length, wanted.size, 'every pinned sidecar extracted');
+        assert.ok(entries.length > wanted.size, 'sidecars + a sample doc bundle extracted');
         for (const [name, expected] of small) {
           const result = await verifyFile(join(dest, 'vdocs-data-v1/gold', name), expected);
           assert.ok(result.ok, `${name}: ${'reason' in result ? result.reason : 'ok'}`);
         }
+
+        // The hydration chain against a real gold bundle: frontmatter
+        // splits, nav chrome strips, a real CSV sidecar hydrates into
+        // a pipe table, and CAS image refs degrade visibly.
+        const raw = readFileSync(join(dest, SAMPLE_DOC, 'body.md'), 'utf8');
+        const { frontmatter, body } = splitFrontmatter(raw);
+        assert.ok(frontmatter.includes('app_code: PXRM'));
+
+        const stripped = stripNavChrome(body);
+        assert.ok(!stripped.includes('[↑ Back to Contents](#contents)'));
+
+        const hydrated = hydrateTables(stripped, (rel) => {
+          try {
+            return readFileSync(join(dest, SAMPLE_DOC, rel), 'utf8');
+          } catch {
+            return undefined;
+          }
+        });
+        assert.ok(/\*\*Table 1\b/.test(hydrated), 'placeholder became a caption');
+        assert.ok(/^\| .+ \|$/m.test(hydrated), 'a pipe table materialized');
+
+        const withImages = rewriteImages(hydrated, () => undefined);
+        assert.ok(withImages.includes('figure unavailable'), 'CAS refs degrade to notes');
+        assert.ok(!/!\[[^\]]*\]\([0-9a-f]{64}\./.test(withImages), 'no raw CAS image refs remain');
       } finally {
         rmSync(dest, { recursive: true, force: true });
       }

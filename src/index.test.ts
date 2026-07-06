@@ -43,6 +43,14 @@ describe('public API surface (atlas data layer)', () => {
     'sectionMarkdown',
     'readingUriParts',
     'sectionIdFromQuery',
+    // hydration transforms
+    'splitFrontmatter',
+    'stripNavChrome',
+    'rewriteImages',
+    'parseCsv',
+    'csvToMarkdownTable',
+    'hydrateTables',
+    'hydrateBoilerplate',
     // twin-link contract v1
     'loadTwinLinkContract',
     'validatePayload',

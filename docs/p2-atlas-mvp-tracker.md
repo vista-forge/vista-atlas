@@ -22,8 +22,8 @@ parity on 10 benchmark docs; vdocs-web frozen.
 | Twin-link handlers (Atlas side of contract v1) | **mostly done 2026-07-05** | `openSection`/`openDoc`/`search`/`pins` commands + the vscode:// URI handler (parseDeepLink-routed) registered; `openEntity` awaits entity queries (P4) |
 | VSCode extension harness (activate, library tree, search view) | **done 2026-07-05** | ext/ thin adapters over tested model (compass discipline); library tree = facets→values(+counts, vocab labels)→docs→sections; FTS quick-pick search; sections render via VSCode's own markdown preview (virtual docs) — interim surface until the hydrating webview; in-host smoke green vs real release |
 | Reading pane webview (marked+DOMPurify), TOC/breadcrumbs | todo | body source: chunk reconstruction now; evaluate gold-tree file per section once bundle extract lands |
-| Predecessor bug classes as regression tests (mis-nested extracted-table placeholder; nav chrome; CAS image paths) | todo | TDD-first per clean-room rule, before the hydration transforms they guard |
-| Table (CSV sidecar) + figure (rich-assets) hydration | todo | rich bundles are `excluded` from data-v1 (Track P-vdocs 3 gap) — hydrate from lake-adjacent copies only behind a dev flag, or wait for the producer release |
+| Predecessor bug classes as regression tests (mis-nested extracted-table placeholder; nav chrome; CAS image paths) | **done 2026-07-05** | `src/model/hydrate.ts`, red-first: blockquote-nested placeholder hydrates without collapsing (THE bug), unresolved CAS refs degrade to visible notes, nav chrome strips; chain proven on the real PXRM gold bundle |
+| Table (CSV sidecar) + figure (rich-assets) hydration | **tables done / figures gated** | CSV sidecars ship in the bundle and hydrate to pipe tables (real-corpus test green); figure hydration still gated on rich-assets joining the release (Track P-vdocs 3) — until then `rewriteImages` degrades visibly |
 | 10-benchmark-doc parity acceptance vs vdocs-web | todo | closes P2; freezes vdocs-web |
 
 ## Cross-repo pointer
