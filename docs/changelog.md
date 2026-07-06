@@ -170,7 +170,8 @@ six months. Don't summarise diffs — the diff is the diff. Focus on
   (text, loader) functions, every predecessor bug class encoded as a
   failing test before the code existed (clean-room principle 8):
   - **mis-nested table placeholder** (THE vdocs-web bug that silently
-    collapsed tables): `_[Table N (extracted to CSV)](tables/…csv)_`
+    collapsed tables): the italic `Table N (extracted to CSV)` link to
+    its `tables/…csv` sidecar
     hydrates into a pipe table; a blockquote-nested placeholder keeps
     every generated row inside the quote; a missing sidecar keeps the
     visible link. Nothing is ever dropped.
@@ -178,7 +179,7 @@ six months. Don't summarise diffs — the diff is the diff. Focus on
     resolver; unresolved refs become a visible "figure unavailable"
     note, never a broken image (rich-assets are still excluded from
     data-v1).
-  - **nav chrome**: standalone `[↑ Back to Contents](#contents)` lines
+  - **nav chrome**: standalone `↑ Back to Contents` self-link lines
     strip (P-vdocs 2 consumer workaround); inline mentions survive.
   - plus `splitFrontmatter`, a minimal CSV parser (quoted fields, ""
     escapes, CRLF), `csvToMarkdownTable` (pipe-escaped, row-capped),
