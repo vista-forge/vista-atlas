@@ -3,7 +3,7 @@
 NPM := npm
 BIN := ./node_modules/.bin
 
-.PHONY: install hooks test test-watch test-cov lint format fix typecheck audit check build run clean push pull log
+.PHONY: install hooks test test-watch test-cov lint format fix typecheck audit check build run clean push pull log web-install web-build web-test web-check
 
 install:
 	$(NPM) install
@@ -46,6 +46,22 @@ run:
 
 clean:
 	rm -rf dist coverage .nyc_output *.tsbuildinfo
+
+# --- Vendored SPA (web/) — SvelteKit source for the served web/static ---
+# The built output is committed on purpose (the vsix ships it); regenerate
+# with web-build whenever web/src changes, and commit source + output together.
+
+web-install:
+	cd web && $(NPM) ci
+
+web-build:
+	cd web && $(NPM) run build
+
+web-test:
+	cd web && $(NPM) run test
+
+web-check:
+	cd web && $(NPM) run check
 
 # Append a dated entry to docs/changelog.md.
 # Usage: make log MSG="what changed and why"

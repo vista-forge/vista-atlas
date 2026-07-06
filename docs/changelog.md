@@ -317,3 +317,7 @@ release.
   Svelte source.
 - Whether the now-unused model libs (library/reading/gold/hydrate)
   stay as package exports or get retired — owner's call.
+
+## 2026-07-06
+
+web-build wired: svelte.config.js retargeted to web/static (assets-input remapped to assets/), kit.version.name pinned for deterministic rebuilds (default Date.now() dirtied every rebuild), Makefile web-install/web-build/web-test/web-check, @types/jsdom added (svelte-check was red), SETUP.md rewritten for the Atlas layout. Rebuild verified byte-deterministic; root make check green.

@@ -1,6 +1,7 @@
 # Build artifacts
 dist/
 *.tsbuildinfo
+web/.svelte-kit/
 
 # Dependencies
 node_modules/
