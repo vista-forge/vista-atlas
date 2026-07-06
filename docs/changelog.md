@@ -321,3 +321,7 @@ release.
 ## 2026-07-06
 
 web-build wired: svelte.config.js retargeted to web/static (assets-input remapped to assets/), kit.version.name pinned for deterministic rebuilds (default Date.now() dirtied every rebuild), Makefile web-install/web-build/web-test/web-check, @types/jsdom added (svelte-check was red), SETUP.md rewritten for the Atlas layout. Rebuild verified byte-deterministic; root make check green.
+
+## 2026-07-06
+
+SPA deep-link support (Atlas addition; vdocs-web had no URL state): web/src/lib/deeplink.ts parses ?doc/?section/?q/?scope plus the five displayed facet axes (repeatable, API grammar) — TDD, 9 table cases; +page.svelte starts from that state, opens the linked doc (stub Doc, title upgraded when the result list names it) and section (TOC-matched for its title; falls back to open-by-ID). The section-ID param deliberately shadows the undisplayed 'section' facet axis.

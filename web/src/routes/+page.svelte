@@ -3,6 +3,12 @@
   import DOMPurify from 'dompurify';
   import { renderMarkdown, renderInline } from '$lib/markdown';
   import { parseCsv, csvToTableHtml } from '$lib/csvTable';
+  import { parseDeepLink } from '$lib/deeplink';
+
+  // Deep-link entry (Atlas addition; vdocs-web had no URL state): the
+  // extension's twin-link commands reload the iframe with ?doc/?section/?q/
+  // facet params, and the SPA starts from that state instead of blank.
+  const link = parseDeepLink(typeof location === 'undefined' ? '' : location.search);
 
   // Facet order: the three primary axes (Domain · Audience · Type) lead, then the rest.
   const AXES: [string, string][] = [
@@ -86,9 +92,9 @@
     ['name', 'Name', 'Search document names only'],
     ['headings', 'Headings', 'Search section headings + table-of-contents entries'],
   ];
-  let searchScope = $state<Scope>('all');
+  let searchScope = $state<Scope>(link.scope);
 
-  let sel = $state<Selection>({});
+  let sel = $state<Selection>(link.sel);
   let collapsed = $state<Record<string, boolean>>({});
   // Per-section value sort: 'count' (backend default, most→least) → 'az' → 'za', cycled by the glyph.
   type SortMode = 'count' | 'az' | 'za';
@@ -128,7 +134,7 @@
     dragging = false;
     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
   }
-  let fts = $state('');
+  let fts = $state(link.q);
   let facets = $state<Record<string, FacetValue[]>>({});
   let docs = $state<Doc[]>([]);
   let vocab = $state<Vocab | null>(null);
@@ -225,6 +231,54 @@
     toc = [];
     body = '';
   }
+
+  // Deep-linked doc/section: open it on load. The link carries a bare DocKey
+  // (the extension resolves section→doc before building the URL), so the pane
+  // opens on a stub Doc; the $effect below upgrades the display title once
+  // the result list can name it. A section missing from the TOC (kind-filtered
+  // out) still opens by ID, headed by the ID.
+  let stubKey = $state<string | null>(null);
+  if (link.doc) {
+    const key = link.doc;
+    const sid = link.section;
+    open = {
+      DocKey: key,
+      AppCode: '',
+      DocType: '',
+      PkgNS: '',
+      Section: '',
+      Title: '',
+      DocLabel: '',
+      AppUser: '',
+      DocUser: '',
+    };
+    heading = key;
+    stubKey = key;
+    api
+      .toc(key)
+      .then((t) => {
+        toc = t ?? [];
+        if (!sid) return;
+        const target = toc.find((s) => s.ID === sid);
+        if (target) openSection(target);
+        else {
+          heading = sid;
+          api.section(sid).then((p) => (body = p.text)).catch((e) => (error = String(e)));
+        }
+      })
+      .catch((e) => (error = String(e)));
+    if (!sid) api.preview(key).then((p) => (body = p.text)).catch((e) => (error = String(e)));
+  }
+  $effect(() => {
+    if (!stubKey) return;
+    const named = docs.find((d) => d.DocKey === stubKey);
+    if (!named) return;
+    if (open?.DocKey === stubKey && !open.Title) {
+      open = named;
+      if (heading === stubKey) heading = named.Title || stubKey;
+    }
+    stubKey = null;
+  });
 
   function toggle(axis: string, value: string) {
     // doc_type is shown as families — `value` is a family label; toggle all its member codes at once.
