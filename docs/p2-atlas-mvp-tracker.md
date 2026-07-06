@@ -4,6 +4,20 @@ status: accepted
 
 # P2 — Atlas MVP tracker
 
+> **COURSE CORRECTION (owner, 2026-07-05):** the native-VSCode surface built
+> below (library tree + quick-pick search + markdown-preview reading) was
+> **rejected** — the owner wants a **carbon copy of vdocs-web**: the full
+> faceted-search SPA in a browser-style editor tab. Delivered same day:
+> vdocs-web's built SPA vendored verbatim (`web/static/`), its Go query/API
+> semantics ported 1:1 to TS (`src/server/` — filter builder, CleanTitle,
+> facets/candidates/vocab/toc/section/preview/table/asset routes), served by
+> an in-process `node:http` server and framed in a webview panel
+> (`vistaAtlas.open`), exactly like vdocs-web's own extension minus the Go
+> sidecar. The clean-room rule was amended in `CLAUDE.md` (code reference
+> authorized). The native tree/search/preview surfaces were **removed**; the
+> data layer, bundle install, hydrate/model libs, and contract checks all
+> carry over unchanged underneath the server.
+
 Governing design: `vista-meta/docs/proposals/vista-atlas-and-compass-de-novo.md`
 (§4 Atlas surfaces, §8 sequencing). P2 = vdocs-web parity in-editor: facets,
 search, reading pane with table/figure hydration. Acceptance: side-by-side

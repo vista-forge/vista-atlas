@@ -64,45 +64,16 @@
     "onUri"
   ],
   "contributes": {
-    "views": {
-      "explorer": [
-        {
-          "id": "vistaAtlasLibrary",
-          "name": "VistA Docs",
-          "icon": "$(book)"
-        }
-      ]
-    },
     "commands": [
       {
-        "command": "vistaAtlas.search",
-        "title": "Vista Atlas: Search the Documentation",
-        "icon": "$(search)"
-      },
-      {
-        "command": "vistaAtlas.refresh",
-        "title": "Vista Atlas: Refresh Library",
-        "icon": "$(refresh)"
+        "command": "vistaAtlas.open",
+        "title": "Vista Atlas: Open Navigator"
       },
       {
         "command": "vistaAtlas.reloadData",
         "title": "Vista Atlas: Reload Data (re-verify release)"
       }
     ],
-    "menus": {
-      "view/title": [
-        {
-          "command": "vistaAtlas.search",
-          "when": "view == 'vistaAtlasLibrary'",
-          "group": "navigation@1"
-        },
-        {
-          "command": "vistaAtlas.refresh",
-          "when": "view == 'vistaAtlasLibrary'",
-          "group": "navigation@2"
-        }
-      ]
-    },
     "configuration": {
       "title": "Vista Atlas",
       "properties": {
@@ -111,10 +82,10 @@
           "default": "",
           "description": "Path to a local directory containing index.db (an extracted release root, or the dist staging copy). Empty: fetch-verify the published release bundle into global storage."
         },
-        "vistaAtlas.docLimit": {
-          "type": "number",
-          "default": 500,
-          "description": "Maximum documents listed under one facet value."
+        "vistaAtlas.assetsDir": {
+          "type": "string",
+          "default": "",
+          "description": "Optional path to a content-addressed image store (documents/assets) for figure display. Empty: figures 404 until rich-assets ship in the data release."
         }
       }
     }

@@ -52,6 +52,14 @@ describe('public API surface (atlas data layer)', () => {
     'hydrateTables',
     'hydrateBoilerplate',
     'makeGoldLoaders',
+    // navigator server (the vdocs-web surface, in-process)
+    'startNavigator',
+    'navigatorHandler',
+    'cleanTitle',
+    'where',
+    'ftsSanitize',
+    'isDocAxis',
+    'DOC_AXES',
     // twin-link contract v1
     'loadTwinLinkContract',
     'validatePayload',

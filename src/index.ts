@@ -50,6 +50,20 @@ export {
 } from './model/hydrate.js';
 export { childrenOf, facetDimensions, type LibraryNode } from './model/library.js';
 export { makeGoldLoaders } from './model/gold.js';
+export type {
+  DocWire,
+  FacetValueWire,
+  SectionWire,
+  VocabWire,
+} from './server/core.js';
+export { DOC_AXES, type Filter, ftsSanitize, isDocAxis, where } from './server/filter.js';
+export {
+  type NavigatorOptions,
+  type RunningNavigator,
+  navigatorHandler,
+  startNavigator,
+} from './server/http.js';
+export { cleanTitle } from './server/title.js';
 export {
   type HydrationLoaders,
   readingUriParts,

@@ -13,13 +13,19 @@ prerequisites, deep-link contract). Engine decision (P0, recorded there §11):
 native deps; wrap it behind the store interface. Data = the published vdocs
 `data-vN` release (index.db 322 MB + gold tree), sha256-verified, read-only,
 bound to the `v_*` read-contract views only — never the live lake, never the
-producer repo. **CLEAN-ROOM RULE (owner directive): the predecessor
-(vdocs-web, `~/projects/vdocs-web`) is a behavioral reference, never a code
-source — do NOT port or adapt its Go/Svelte code.** UX parity is re-specified
-from its docs and behavior; its known bug classes become TDD test cases FIRST
-(the mis-nested extracted-table placeholder that silently collapsed tables;
-nav-chrome handling; CAS image-path rewriting). Everything here is written
-test-first against the published read contract, version-pinned, ts-ci gated.
+producer repo. **CLEAN-ROOM RULE — AMENDED BY OWNER 2026-07-05:** the original
+directive (vdocs-web as behavioral reference only, no code porting) was
+**rescinded for vdocs-web**: the owner directed a **carbon copy** of the
+vdocs-web experience ("look at its code and replicate"), so its Go/Svelte code
+is now an authorized reference and its **built SPA is vendored verbatim**
+(`web/static/`, source in `web/`); the Go query/API semantics are ported 1:1
+to TS (`src/server/`). Atlas = that SPA served by an in-process `node:http`
+server over `node:sqlite`, framed full-bleed in a webview panel — the same
+architecture as vdocs-web's own `extension/`, minus the Go sidecar. The
+known-bug-class-as-TDD-first discipline stands (mis-nested table placeholder,
+nav chrome, CAS paths, `#table-` double-render, chunk-overlap duplication).
+Everything here remains written test-first against the published read
+contract, version-pinned, ts-ci gated.
 **Org note:** non-waterline repo (no `m`/`v` layer artifact —
 it never touches an engine); per-repo memory lives in `docs/memory/` per
 `~/vista-forge/CLAUDE.md`, and the org increment protocol applies.

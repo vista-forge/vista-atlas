@@ -20,6 +20,8 @@ export interface FixtureSection {
   readonly seq?: number;
   /** Chunk texts in part order. */
   readonly chunks: readonly string[];
+  /** Search-only flattened table chunks (chunk_id `<section_id>#table-NN.csv`). */
+  readonly tableChunks?: readonly string[];
 }
 
 export interface FixtureDoc {
@@ -28,7 +30,15 @@ export interface FixtureDoc {
   readonly app_code: string;
   readonly app_name?: string;
   readonly doc_type?: string;
+  readonly doc_label?: string;
   readonly section?: string;
+  readonly pkg_ns?: string;
+  readonly app_user?: string;
+  readonly doc_user?: string;
+  readonly software_class?: string;
+  readonly function_category?: string;
+  readonly product_abbr?: string;
+  readonly product_full?: string;
   readonly version?: string;
   readonly patch_id?: string;
   readonly group_key?: string;
@@ -89,7 +99,10 @@ export function buildFixtureDb(
     CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     CREATE TABLE documents (
       doc_key TEXT PRIMARY KEY, title TEXT, app_code TEXT, app_name TEXT,
-      doc_type TEXT, section TEXT, version TEXT, patch_id TEXT, group_key TEXT,
+      doc_type TEXT, doc_label TEXT, section TEXT, pkg_ns TEXT,
+      app_user TEXT, doc_user TEXT, software_class TEXT, function_category TEXT,
+      product_abbr TEXT, product_full TEXT,
+      version TEXT, patch_id TEXT, group_key TEXT,
       is_latest INTEGER, pub_year TEXT, source_url TEXT, bundle_path TEXT,
       word_count INTEGER, section_count INTEGER
     );
@@ -130,10 +143,12 @@ export function buildFixtureDb(
   }
 
   const putDoc = db.prepare(
-    `INSERT INTO documents (doc_key, title, app_code, app_name, doc_type, section,
+    `INSERT INTO documents (doc_key, title, app_code, app_name, doc_type, doc_label,
+       section, pkg_ns, app_user, doc_user, software_class, function_category,
+       product_abbr, product_full,
        version, patch_id, group_key, is_latest, pub_year, source_url, bundle_path,
        word_count, section_count)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   );
   const putSection = db.prepare(
     `INSERT INTO doc_sections (section_id, doc_key, slug, title, level, toc_level,
@@ -160,7 +175,15 @@ export function buildFixtureDb(
       doc.app_code,
       doc.app_name ?? doc.app_code,
       doc.doc_type ?? 'UM',
+      doc.doc_label ?? 'User Manual',
       doc.section ?? 'Clinical',
+      doc.pkg_ns ?? doc.app_code,
+      doc.app_user ?? 'clinical',
+      doc.doc_user ?? 'clinical',
+      doc.software_class ?? 'I',
+      doc.function_category ?? 'Clinical care',
+      doc.product_abbr ?? '',
+      doc.product_full ?? '',
       doc.version ?? '1.0',
       doc.patch_id ?? null,
       doc.group_key ?? doc.doc_key,
@@ -188,6 +211,20 @@ export function buildFixtureDb(
       for (const [part, text] of section.chunks.entries()) {
         const chunkId = part === 0 ? section.section_id : `${section.section_id}#${part}`;
         putChunk.run(chunkId, section.section_id, doc.doc_key, part, text);
+        putFts?.run(
+          chunkId,
+          section.section_id,
+          doc.doc_key,
+          section.title,
+          doc.title,
+          section.section_path ?? `${doc.title} > ${section.title}`,
+          text,
+        );
+      }
+      for (const [i, text] of (section.tableChunks ?? []).entries()) {
+        const n = String(i + 1).padStart(2, '0');
+        const chunkId = `${section.section_id}#table-${n}.csv`;
+        putChunk.run(chunkId, section.section_id, doc.doc_key, section.chunks.length + i, text);
         putFts?.run(
           chunkId,
           section.section_id,

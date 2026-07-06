@@ -262,3 +262,58 @@ in); `make check` green; vsix builds clean.
 
 - GitHub-release publication of the vsix.
 - The human side-by-side vs vdocs-web + the freeze decision (owner).
+
+## 2026-07-05 — COURSE CORRECTION: the vdocs-web carbon copy
+
+**Why:** the owner rejected the native-VSCode surface ("completely
+utterly wrong") — the target is the vdocs-web experience itself: the
+full faceted-search SPA in a browser-style editor tab, replicated
+from its code (clean-room rule amended in CLAUDE.md; code reference
+authorized).
+
+**Done:**
+
+- **Vendored the SPA verbatim**: vdocs-web's built frontend
+  (internal/web/static, 15 files) → `web/static/`, served byte-for-
+  byte; the SvelteKit source + configs → `web/` for future rebuilds.
+- **Ported the entire server surface to TS** (`src/server/`), test-
+  first against the Go reference's own test cases:
+  - `filter.ts` — the Filter→WHERE builder: 10-axis whitelist
+    (injection-proof), OR-within/AND-across, axis relaxation,
+    doc-level FTS subquery, FTS sanitization + name/headings scopes.
+  - `title.ts` — CleanTitle version/patch de-noising, all 13
+    reference cases passing verbatim.
+  - `core.ts` — facets/candidates/vocab/TOC/section/preview/
+    bundlePath with the reference semantics: latest-only, cleaned
+    display titles, TOC kind filter, **`#table-` search-only chunks
+    excluded from bodies** (the double-render class — my earlier
+    reading surface had this bug; now encoded in tests) and **chunk
+    overlap deduped** (an improvement over the reference, which
+    double-rendered the producer's one-block window overlap).
+  - `http.ts` — the nine /api routes with PascalCase wire shapes the
+    SPA expects, %2F-encoded doc keys, table/asset routes
+    (traversal-guarded), static SPA serving with MIME + app-shell
+    fallback, loopback-only ephemeral port.
+- **Extension rewritten around the panel**: `vistaAtlas.open` →
+  acquire release → contract check → in-process server →
+  full-bleed iframe via asExternalUri + portMapping (the predecessor
+  extension's exact pattern). Native tree/search/preview surfaces
+  removed; twin-link commands route to the navigator; reloadData
+  restarts the session.
+- vsix now ships the SPA (88 KB, 23 files).
+
+**Smoke results:** 294 unit tests (33 filter/title reference ports,
+13 core, 17 http) + gated benchmark; `make check` green; in-host
+smoke drives the real thing — navigator opens, SPA shell serves,
+facets (75+ apps) and kaajee candidates answer over the verified
+release.
+
+**Deferred:**
+
+- SPA deep-link navigation for twin-link payloads (openSection
+  currently opens the navigator; targeted navigation needs SPA URL
+  state).
+- `make web-build` wiring to rebuild `web/static` from the vendored
+  Svelte source.
+- Whether the now-unused model libs (library/reading/gold/hydrate)
+  stay as package exports or get retired — owner's call.

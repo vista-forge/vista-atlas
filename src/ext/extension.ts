@@ -1,33 +1,35 @@
 /**
- * Activation and wiring only (the twin discipline): acquire the data
- * release via the store layer (bundle fetch-verify-extract into
- * globalStorage, or a local dataPath override), open index.db
- * read-only, contract-check it, and register the library tree, the
- * reading provider, the search command, and the twin-link command +
- * URI surface. Everything testable lives in src/model/ and src/store/.
+ * Activation and wiring only: acquire the data release (bundle
+ * fetch-verify-extract into globalStorage, or a local dataPath
+ * override), open index.db read-only, contract-check it, start the
+ * in-process navigator server, and frame it in an editor-tab webview —
+ * the vdocs-web experience, carbon-copied (owner direction,
+ * 2026-07-05). Everything testable lives in src/server/ and src/store/.
  */
 
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import * as vscode from 'vscode';
-import { makeGoldLoaders } from '../model/gold.js';
-import { searchChunks } from '../model/queries.js';
-import type { HydrationLoaders } from '../model/reading.js';
+import { type RunningNavigator, startNavigator } from '../server/http.js';
 import { installDataRelease } from '../store/bundle.js';
 import { checkIndexDb } from '../store/contract.js';
 import { type Store, openStore } from '../store/engine.js';
 import { loadReleaseRecord } from '../store/release.js';
 import { loadTwinLinkContract, parseDeepLink } from '../twinlink.js';
-import { LibraryTreeProvider } from './libraryTree.js';
-import { READING_SCHEME, ReadingContentProvider, readingUri } from './reading.js';
+import { panelHtml } from './panelHtml.js';
 
+const VIEW_TYPE = 'vistaAtlas.navigator';
 const BUNDLE_ASSET = 'vdocs-data-v1.tar.gz';
 const MANIFEST_ASSET = 'vdocs-data-v1.manifest.json';
 const READ_SCHEMA_VERSION = '1.5';
 
-let store: Store | undefined;
-let loaders: HydrationLoaders = {};
+interface Session {
+  readonly store: Store;
+  readonly navigator: RunningNavigator;
+  readonly panel: vscode.WebviewPanel;
+}
+let session: Session | null = null;
 let pins: { tag: string; corpus_content_hash: string } = { tag: '', corpus_content_hash: '' };
 
 function config(): vscode.WorkspaceConfiguration {
@@ -44,7 +46,7 @@ async function acquireDbPath(context: vscode.ExtensionContext): Promise<string> 
     return override.endsWith('.db') ? override : join(override, 'index.db');
   }
   // No override: install (or re-verify) the bundle, whose extracted
-  // root carries the gold tree the hydration loaders read.
+  // root carries the gold tree the table route serves from.
   const record = loadReleaseRecord(context.asAbsolutePath('contracts/releases/vdocs-data-v1.json'));
   const result = await vscode.window.withProgress(
     {
@@ -67,123 +69,103 @@ async function acquireDbPath(context: vscode.ExtensionContext): Promise<string> 
   return result.indexDb;
 }
 
-async function openData(
+/** Open the db, contract-check it, and start the navigator server. */
+async function startSessionServer(
   context: vscode.ExtensionContext,
-  view: vscode.TreeView<unknown>,
-): Promise<void> {
+): Promise<{ store: Store; navigator: RunningNavigator }> {
   const record = loadReleaseRecord(context.asAbsolutePath('contracts/releases/vdocs-data-v1.json'));
   const dbPath = await acquireDbPath(context);
-  store?.close();
-  store = openStore(dbPath);
-  const goldRoot = join(dirname(dbPath), 'gold');
-  loaders = existsSync(goldRoot) ? makeGoldLoaders(goldRoot) : {};
+  const store = openStore(dbPath);
 
   const report = checkIndexDb(store, {
     readSchemaVersion: READ_SCHEMA_VERSION,
     ...(record.content_hash === undefined ? {} : { corpusContentHash: record.content_hash }),
   });
-  const meta = new Map(
-    store.all('SELECT key, value FROM meta').map((row) => [String(row.key), String(row.value)]),
-  );
-  const hash = meta.get('corpus_content_hash') ?? '';
-  pins = { tag: record.tag, corpus_content_hash: hash };
-  view.description = `${record.tag} · ${hash.slice(0, 8)}`;
   if (!report.ok) {
     vscode.window.showWarningMessage(
       `Vista Atlas: data contract mismatch — ${report.problems.join('; ')}`,
     );
   }
+  const meta = new Map(
+    store.all('SELECT key, value FROM meta').map((row) => [String(row.key), String(row.value)]),
+  );
+  pins = { tag: record.tag, corpus_content_hash: meta.get('corpus_content_hash') ?? '' };
+
+  // Gold consolidated tree (table sidecars) sits next to the installed
+  // index.db; a bare-db dataPath simply leaves the table route dark.
+  const goldConsolidated = join(dirname(dbPath), 'gold', 'consolidated');
+  const assetsDir = expandHome(config().get<string>('assetsDir', ''));
+  const navigator = await startNavigator({
+    store,
+    staticDir: context.asAbsolutePath('web/static'),
+    ...(existsSync(goldConsolidated) ? { tablesDir: goldConsolidated } : {}),
+    ...(assetsDir !== '' ? { assetsDir } : {}),
+  });
+  return { store, navigator };
 }
 
-async function openSection(sectionId: string): Promise<void> {
-  await vscode.commands.executeCommand('markdown.showPreview', readingUri(sectionId));
+/** Open (or reveal) the navigator panel. Returns the server URL. */
+async function openNavigator(context: vscode.ExtensionContext): Promise<{ url: string }> {
+  if (session !== null) {
+    session.panel.reveal(vscode.ViewColumn.Active);
+    return { url: session.navigator.url };
+  }
+  const { store, navigator } = await startSessionServer(context);
+  const panel = vscode.window.createWebviewPanel(
+    VIEW_TYPE,
+    'Vista Atlas',
+    vscode.ViewColumn.Active,
+    {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+      // Make the loopback port reachable from inside the webview, locally
+      // and over Remote-SSH.
+      portMapping: [{ webviewPort: navigator.port, extensionHostPort: navigator.port }],
+    },
+  );
+  session = { store, navigator, panel };
+
+  panel.onDidDispose(
+    () => {
+      if (session?.panel === panel) {
+        void session.navigator.close();
+        session.store.close();
+        session = null;
+      }
+    },
+    null,
+    context.subscriptions,
+  );
+
+  const external = await vscode.env.asExternalUri(vscode.Uri.parse(navigator.url));
+  panel.webview.html = panelHtml(external.toString());
+  return { url: navigator.url };
 }
 
-async function runSearch(query: string | undefined): Promise<void> {
-  const active = store;
-  if (active === undefined) {
-    return;
-  }
-  const text =
-    query ??
-    (await vscode.window.showInputBox({
-      prompt: 'Search the VA documentation corpus (FTS5)',
-      placeHolder: 'e.g. kaajee, ^DIC, menu manager',
-    }));
-  if (text === undefined || text.trim() === '') {
-    return;
-  }
-  const hits = searchChunks(active, text, { limit: 30 });
-  if (hits.length === 0) {
-    vscode.window.showInformationMessage(`Vista Atlas: no hits for "${text}".`);
-    return;
-  }
-  const picked = await vscode.window.showQuickPick(
-    hits.map((hit) => ({
-      label: hit.doc_title,
-      description: hit.title,
-      detail: hit.snippet.replaceAll('«', '').replaceAll('»', ''),
-      sectionId: hit.section_id,
-    })),
-    { matchOnDescription: true, matchOnDetail: true, title: `Results for "${text}"` },
-  );
-  if (picked !== undefined) {
-    await openSection(picked.sectionId);
+async function closeSession(): Promise<void> {
+  if (session !== null) {
+    const closing = session;
+    session = null;
+    closing.panel.dispose();
+    await closing.navigator.close().catch(() => {});
+    closing.store.close();
   }
 }
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  const provider = new LibraryTreeProvider(
-    () => store,
-    () => config().get<number>('docLimit', 500),
-  );
-  const view = vscode.window.createTreeView('vistaAtlasLibrary', { treeDataProvider: provider });
-  context.subscriptions.push(view);
-
-  context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(
-      READING_SCHEME,
-      new ReadingContentProvider(
-        () => store,
-        () => loaders,
-      ),
-    ),
-  );
-
+export function activate(context: vscode.ExtensionContext): void {
   const contract = loadTwinLinkContract(context.asAbsolutePath('contracts/twin-link.v1.json'));
   context.subscriptions.push(
-    vscode.commands.registerCommand('vistaAtlas.refresh', () => provider.refresh()),
+    vscode.commands.registerCommand('vistaAtlas.open', () => openNavigator(context)),
     vscode.commands.registerCommand('vistaAtlas.reloadData', async () => {
-      await openData(context, view);
-      provider.refresh();
+      await closeSession();
+      await openNavigator(context);
     }),
-    vscode.commands.registerCommand('vistaAtlas.search', (payload?: { query?: string }) =>
-      runSearch(payload?.query),
-    ),
-    vscode.commands.registerCommand(
-      'vistaAtlas.openSection',
-      (payload?: { section_id?: string }) => {
-        if (payload?.section_id !== undefined) {
-          return openSection(payload.section_id);
-        }
-        return undefined;
-      },
-    ),
-    vscode.commands.registerCommand(
-      'vistaAtlas.openDoc',
-      async (payload?: { doc_key?: string }) => {
-        const active = store;
-        if (active === undefined || payload?.doc_key === undefined) {
-          return;
-        }
-        const { listSections } = await import('../model/queries.js');
-        const sections = listSections(active, payload.doc_key);
-        const first = sections.find((s) => s.searchable === 1) ?? sections[0];
-        if (first !== undefined) {
-          await openSection(first.section_id);
-        }
-      },
-    ),
+    // Twin-link contract v1 surface: the SPA owns navigation, so the
+    // cross-extension entries open the navigator (payload-targeted
+    // navigation lands with SPA deep-link support).
+    vscode.commands.registerCommand('vistaAtlas.search', () => openNavigator(context)),
+    vscode.commands.registerCommand('vistaAtlas.openDoc', () => openNavigator(context)),
+    vscode.commands.registerCommand('vistaAtlas.openSection', () => openNavigator(context)),
     vscode.commands.registerCommand('vistaAtlas.pins', () => pins),
     vscode.window.registerUriHandler({
       handleUri: async (uri) => {
@@ -196,11 +178,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       },
     }),
   );
-
-  await openData(context, view);
 }
 
 export function deactivate(): void {
-  store?.close();
-  store = undefined;
+  void closeSession();
 }

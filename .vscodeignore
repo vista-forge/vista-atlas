@@ -2,6 +2,7 @@
 **
 !dist/extension.cjs
 !contracts/**
+!web/static/**
 !README.md
 !LICENSE
 !package.json

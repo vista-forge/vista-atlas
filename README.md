@@ -5,18 +5,19 @@ documentation *says*.** The de-novo successor of vdocs-web (and, with its twin, 
 [vista-compass](https://github.com/vista-forge/vista-compass) (what the system
 measurably *is*); the two cross-link through the vdocs↔vista-meta entity bridge.
 
-> **Status: working extension (2026-07-05).** The governing design is the proposal
+> **Status: the vdocs-web carbon copy, working (2026-07-05).** The governing
+> design is the proposal
 > [`vista-atlas-and-compass-de-novo.md`](https://github.com/rafael5/vista-meta/blob/main/docs/proposals/vista-atlas-and-compass-de-novo.md)
-> (in vista-meta's docs). P0 done — **`node:sqlite`** in the extension host
-> (VSCode ≥ 1.125, Node 24), zero native dependencies. P1 shared store consumed
-> (byte-identical with vista-compass's, pending vista-store extraction). P2 in
-> flight and substantially landed: pinned data-v1 release with bundle
-> fetch-verify-extract, faceted library tree, scoped FTS5 search, and a
-> hydrating reading surface (tables from CSV sidecars, chrome stripped, CAS
-> images degrade visibly) — in-host smoke and a 10-doc benchmark sweep pass
-> against the real release; `npm run vsix` builds an installable package.
-> Open: webview polish, vsix release publication, the human side-by-side vs
-> vdocs-web — see [`docs/p2-atlas-mvp-tracker.md`](docs/p2-atlas-mvp-tracker.md).
+> (in vista-meta's docs), **course-corrected by the owner**: Atlas is the
+> vdocs-web experience in an editor tab — the full faceted-search SPA
+> (vendored verbatim in `web/static/`) served by an in-process `node:http` +
+> **`node:sqlite`** server (`src/server/`, a 1:1 TS port of vdocs-web's Go
+> query/API layer) and framed full-bleed in a webview panel
+> (**Vista Atlas: Open Navigator**). Data: the pinned data-v1 release, bundle
+> fetch-verify-extract into global storage. In-host smoke drives the real
+> thing; `npm run vsix` packages it (88 KB). Open: SPA deep-link navigation
+> for twin-link payloads, vsix release publication — see
+> [`docs/p2-atlas-mvp-tracker.md`](docs/p2-atlas-mvp-tracker.md).
 
 ## What it will do
 
