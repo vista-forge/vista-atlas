@@ -16,8 +16,12 @@ describe('public API surface (atlas data layer)', () => {
     'parseReleaseRecord',
     'loadReleaseRecord',
     'assetUrl',
-    // fetch
+    // fetch + bundle install
     'ensureAsset',
+    'installDataRelease',
+    'parseProducerManifest',
+    'loadProducerManifest',
+    'extractTarGz',
     // index.db contract
     'checkIndexDb',
     'INDEX_DB_VIEWS',

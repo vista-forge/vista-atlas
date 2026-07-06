@@ -17,16 +17,27 @@ export {
 } from './store/contract.js';
 export { openStore, type SqlRow, type SqlValue, type Store } from './store/engine.js';
 export {
+  installDataRelease,
+  type InstallOptions,
+  type InstallResult,
+} from './store/bundle.js';
+export {
   ensureAsset,
   type EnsureAssetOptions,
   type EnsureAssetResult,
 } from './store/fetch.js';
+export {
+  loadProducerManifest,
+  parseProducerManifest,
+  type ProducerManifest,
+} from './store/manifest.js';
 export {
   assetUrl,
   loadReleaseRecord,
   parseReleaseRecord,
   type ReleaseRecord,
 } from './store/release.js';
+export { type ExtractOptions, extractTarGz, type TarEntry } from './store/tar.js';
 export { type ExpectedFile, sha256File, verifyFile, type VerifyResult } from './store/verify.js';
 export {
   type DocumentDetail,

@@ -87,3 +87,35 @@ six months. Don't summarise diffs — the diff is the diff. Focus on
 - vista-store extraction to a sibling repo (cross-repo; coordinator
   session) — Atlas consuming the modules is the proposal's trigger.
 - Entity queries (P4 surface) — views are contract-checked but unqueried.
+
+## 2026-07-05 — bundle install path: tar extractor + installDataRelease
+
+**Done:**
+
+- `tar.ts`: dependency-free streaming tar.gz extractor — exactly the
+  dialect the producer emits (Python tarfile PAX default: file-only
+  entries, ustar prefix splits, PAX `path` overrides) and hardened
+  against hostile archives (absolute/`..` paths, link entries,
+  corrupt checksums all reject; TDD'd via a hand-assembled tar-bytes
+  fixture builder so every dialect + attack case is explicit).
+- `manifest.ts`: producer-manifest parser (defensive; it's a fetched
+  artifact, not a committed one).
+- `bundle.ts` `installDataRelease`: the full chain — ensure manifest
+  asset → corpus-hash drift check vs the committed record → ensure
+  bundle asset → extract to a staging dir → verify every
+  manifest-pinned inner file → atomic rename into place. Idempotent:
+  a verified install makes no network request; a failed hop leaves no
+  partial install.
+- Real-bundle integration smoke: the extractor runs against the actual
+  98 MB release tar.gz (filtered to the small pinned gold sidecars, so
+  no 322 MB write) and every extracted file sha-verifies. ~2.2 s.
+
+**Smoke results:** 156 tests, statements 97.9% / funcs 100%;
+`make check` green; real-bundle extraction PASS.
+
+**Deferred:**
+
+- Wiring `installDataRelease` to the extension's globalStorage +
+  a first-run progress UI — lands with the extension harness.
+- The extracted gold tree as the reading-pane body source (vs chunk
+  reconstruction) — decide when the webview work starts.

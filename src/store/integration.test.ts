@@ -5,7 +5,9 @@ import { describe, it } from 'node:test';
 import { facetCounts, getDocument, searchChunks, sectionText } from '../model/queries.ts';
 import { checkIndexDb } from './contract.ts';
 import { openStore } from './engine.ts';
+import { loadProducerManifest } from './manifest.ts';
 import { loadReleaseRecord } from './release.ts';
+import { extractTarGz } from './tar.ts';
 import { verifyFile } from './verify.ts';
 
 // Integration: the real published data-v1 artifacts, when the local
@@ -19,6 +21,7 @@ const DIST = join(
 );
 const REAL_DB = join(DIST, 'index.db');
 const REAL_MANIFEST = join(DIST, 'vdocs-data-v1.manifest.json');
+const REAL_BUNDLE = join(DIST, 'vdocs-data-v1.tar.gz');
 const RECORD = new URL('../../contracts/releases/vdocs-data-v1.json', import.meta.url).pathname;
 
 describe('the real vdocs data-v1 release', () => {
@@ -72,6 +75,33 @@ describe('the real vdocs data-v1 release', () => {
         assert.ok(apps.length > 50, `app facet is populated (${apps.length})`);
       } finally {
         store.close();
+      }
+    },
+  );
+
+  it(
+    'the tar reader extracts the real bundle (small pinned files, sha-verified)',
+    { skip: !(existsSync(REAL_BUNDLE) && existsSync(REAL_MANIFEST)) },
+    async () => {
+      const manifest = loadProducerManifest(REAL_MANIFEST);
+      const small = Object.entries(manifest.files).filter(([name]) => name !== 'index.db');
+      assert.ok(small.length >= 5, 'manifest pins the gold sidecar files');
+
+      const { mkdtempSync, rmSync } = await import('node:fs');
+      const { tmpdir } = await import('node:os');
+      const dest = mkdtempSync(join(tmpdir(), 'atlas-real-tar-'));
+      try {
+        const wanted = new Set(small.map(([name]) => `vdocs-data-v1/gold/${name}`));
+        const entries = await extractTarGz(REAL_BUNDLE, dest, {
+          filter: (path) => wanted.has(path),
+        });
+        assert.equal(entries.length, wanted.size, 'every pinned sidecar extracted');
+        for (const [name, expected] of small) {
+          const result = await verifyFile(join(dest, 'vdocs-data-v1/gold', name), expected);
+          assert.ok(result.ok, `${name}: ${'reason' in result ? result.reason : 'ok'}`);
+        }
+      } finally {
+        rmSync(dest, { recursive: true, force: true });
       }
     },
   );
