@@ -1,0 +1,7 @@
+# Everything except what the extension needs at runtime.
+**
+!dist/extension.cjs
+!contracts/**
+!README.md
+!LICENSE
+!package.json

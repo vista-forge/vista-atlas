@@ -230,3 +230,35 @@ real-corpus hydration chain PASS.
   polish now that the preview surface hydrates.
 - Figure hydration proper — still gated on rich-assets joining the
   release (Track P-vdocs 3).
+
+## 2026-07-05 — vsix packaging + the P2 benchmark sweep
+
+**Done:**
+
+- **vsix**: `.vscodeignore` whitelist strategy (the npm `files` field
+  had to go — vsce refuses both); `npm run vsix` produces a 19 KB
+  `vista-atlas-0.1.0.vsix` carrying exactly the runtime payload
+  (esbuild bundle + the two contract artifacts + README/LICENSE).
+- **Benchmark sweep** (`src/store/benchmark.test.ts`, opt-in via
+  `ATLAS_BENCHMARK=1`): the automated core of the §8 P2 acceptance.
+  Ten documents across clinical/infrastructure/financial apps and
+  doc types (FileMan DG, Kernel TM, Broker DG, CPRS UM, Reminders MM,
+  Lab TM, Pharmacy UM, TIU TM, Health Summary UM, VBECS UG): each
+  resolves, lists a TOC exactly matching its declared section_count,
+  renders every section (~4k total) chrome-free with its citation
+  line, and is found by app-filtered search. **PASS** against the
+  real data-v1 release.
+- **Producer gap found and recorded**: index.db has no
+  `chunks(section_id)` index — every section body is a table SCAN
+  (~36 ms). vdocs-web reconstructed whole docs, so the per-section
+  shape was never proven; Atlas makes it one. Filed in the tracker as
+  a Track P-vdocs item; the sweep is opt-in until the producer ships
+  the index.
+
+**Smoke results:** 222 tests + gated sweep PASS (141 s when opted
+in); `make check` green; vsix builds clean.
+
+**Deferred:**
+
+- GitHub-release publication of the vsix.
+- The human side-by-side vs vdocs-web + the freeze decision (owner).
