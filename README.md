@@ -1,11 +1,11 @@
-# Vista Atlas
+# VistA Atlas
 
 **The VA VistA documentation library, inside VSCode — the documentation half
-of a two-extension pair.** Vista Atlas shows what the documentation *says*:
+of a two-extension pair.** VistA Atlas shows what the documentation *says*:
 1,000+ manuals and guides across 100+ VistA applications, drawn from the VA
 Software Document Library, as a faceted library, ranked full-text search,
 and a section-by-section reading pane in an editor tab. Its sibling
-extension, [**Vista Compass**](https://github.com/vista-forge/vista-compass),
+extension, [**VistA Compass**](https://github.com/vista-forge/vista-compass),
 shows what the system *measurably is* — routines, call graphs, globals,
 FileMan files, RPCs — and the two cross-link: hover a routine or global in
 Compass and jump straight to the manuals that document it; find a fact in a
@@ -35,7 +35,7 @@ the question. Atlas closes the gap:
 - **The docs live nowhere near the code.** Reading a routine in one window
   and its technical manual in a PDF viewer in another is how context gets
   dropped. Atlas puts the manual in an editor tab beside the `.m` file —
-  and, with Vista Compass installed, one click apart from it.
+  and, with VistA Compass installed, one click apart from it.
 - **You cannot tell which document you need.** A hundred applications, each
   with user manuals, technical manuals, release notes, install guides —
   Atlas's five facet axes (domain, audience, type, app user, namespace) cut
@@ -93,7 +93,7 @@ selection. Three scopes:
 
 ### Deep links and cross-extension integration
 
-Fully optional — every twin feature degrades gracefully when Vista Compass
+Fully optional — every twin feature degrades gracefully when VistA Compass
 is absent. Other tools (including Compass) can land the navigator on an
 exact target:
 
@@ -105,23 +105,23 @@ exact target:
 The same operations are available as VSCode commands for programmatic use:
 `vistaAtlas.openDoc`, `vistaAtlas.openSection`, `vistaAtlas.search`, and
 `vistaAtlas.pins` (reports the installed release tag and corpus content
-hash — the release-pair handshake Vista Compass checks on startup).
+hash — the release-pair handshake VistA Compass checks on startup).
 
 ## Commands
 
 | Command | What it does |
 |---|---|
-| **Vista Atlas: Open Navigator** | Open (or reveal) the navigator in an editor tab |
-| **Vista Atlas: Reload Data** | Restart the session and re-verify the data release (use after changing `vistaAtlas.dataPath`) |
+| **VistA Atlas: Open Navigator** | Open (or reveal) the navigator in an editor tab |
+| **VistA Atlas: Reload Data** | Restart the session and re-verify the data release (use after changing `vistaAtlas.dataPath`) |
 
 ## Getting started
 
 1. Install the extension (VSCode 1.125 or later).
-2. Run **Vista Atlas: Open Navigator** from the Command Palette. First open
+2. Run **VistA Atlas: Open Navigator** from the Command Palette. First open
    downloads the documentation data release (~300 MB), verifies it against
    its published sha256 manifest, and installs it into extension storage.
    Every open after that is instant and fully offline.
-3. Install [Vista Compass](https://github.com/vista-forge/vista-compass) to
+3. Install [VistA Compass](https://github.com/vista-forge/vista-compass) to
    light up the code cross-links.
 
 If you already have a copy of the release on disk, point the

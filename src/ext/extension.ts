@@ -61,7 +61,7 @@ async function acquireDbPath(context: vscode.ExtensionContext): Promise<string> 
   const result = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'Vista Atlas: verifying the vdocs data release…',
+      title: 'VistA Atlas: verifying the vdocs data release…',
     },
     () =>
       installDataRelease({
@@ -73,7 +73,7 @@ async function acquireDbPath(context: vscode.ExtensionContext): Promise<string> 
   );
   if (result.status === 'installed') {
     vscode.window.showInformationMessage(
-      `Vista Atlas: fetched, verified, and installed ${BUNDLE_ASSET} (${record.tag}).`,
+      `VistA Atlas: fetched, verified, and installed ${BUNDLE_ASSET} (${record.tag}).`,
     );
   }
   return result.indexDb;
@@ -93,7 +93,7 @@ async function startSessionServer(
   });
   if (!report.ok) {
     vscode.window.showWarningMessage(
-      `Vista Atlas: data contract mismatch — ${report.problems.join('; ')}`,
+      `VistA Atlas: data contract mismatch — ${report.problems.join('; ')}`,
     );
   }
   const meta = new Map(
@@ -146,7 +146,7 @@ async function openNavigator(
   const { store, navigator } = await startSessionServer(context);
   const panel = vscode.window.createWebviewPanel(
     VIEW_TYPE,
-    'Vista Atlas',
+    'VistA Atlas',
     vscode.ViewColumn.Active,
     {
       enableScripts: true,
@@ -214,7 +214,7 @@ export function activate(context: vscode.ExtensionContext): void {
           const link = parseDeepLink(contract, uri.toString());
           await vscode.commands.executeCommand(link.command, link.payload);
         } catch (err) {
-          vscode.window.showWarningMessage(`Vista Atlas: bad deep link — ${String(err)}`);
+          vscode.window.showWarningMessage(`VistA Atlas: bad deep link — ${String(err)}`);
         }
       },
     }),

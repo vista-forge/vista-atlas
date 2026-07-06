@@ -1,7 +1,7 @@
 {
   "name": "vista-atlas",
   "version": "0.1.0",
-  "description": "Vista Atlas — VSCode extension over the vdocs gold-corpus data release: faceted library, FTS5 search, reading pane with table/figure hydration, entity pages. What the VA documentation SAYS.",
+  "description": "VistA Atlas — VSCode extension over the vdocs gold-corpus data release: faceted library, FTS5 search, reading pane with table/figure hydration, entity pages. What the VA documentation SAYS.",
   "type": "module",
   "main": "./dist/extension.cjs",
   "types": "./dist/index.d.ts",
@@ -55,7 +55,7 @@
     "type": "git",
     "url": "https://github.com/vista-forge/vista-atlas"
   },
-  "displayName": "Vista Atlas",
+  "displayName": "VistA Atlas",
   "publisher": "vista-forge",
   "icon": "media/icon.png",
   "categories": [
@@ -68,15 +68,15 @@
     "commands": [
       {
         "command": "vistaAtlas.open",
-        "title": "Vista Atlas: Open Navigator"
+        "title": "VistA Atlas: Open Navigator"
       },
       {
         "command": "vistaAtlas.reloadData",
-        "title": "Vista Atlas: Reload Data (re-verify release)"
+        "title": "VistA Atlas: Reload Data (re-verify release)"
       }
     ],
     "configuration": {
-      "title": "Vista Atlas",
+      "title": "VistA Atlas",
       "properties": {
         "vistaAtlas.dataPath": {
           "type": "string",

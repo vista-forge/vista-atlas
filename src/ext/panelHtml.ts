@@ -39,14 +39,14 @@ export function panelHtml(frameUri: string): string {
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; frame-src ${frameSrc}; style-src 'unsafe-inline';" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vista Atlas</title>
+  <title>VistA Atlas</title>
   <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
     iframe { width: 100%; height: 100%; border: 0; display: block; }
   </style>
 </head>
 <body>
-  <iframe src="${safeUri}" title="Vista Atlas" allow="clipboard-read; clipboard-write"></iframe>
+  <iframe src="${safeUri}" title="VistA Atlas" allow="clipboard-read; clipboard-write"></iframe>
 </body>
 </html>`;
 }

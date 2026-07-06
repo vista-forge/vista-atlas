@@ -353,7 +353,7 @@
 </script>
 
 <header>
-  <h1 class="brand"><img class="logo" src="/logo.svg" alt="Vista Atlas" /></h1>
+  <h1 class="brand"><img class="logo" src="/logo.svg" alt="VistA Atlas" /></h1>
   <input class="fts" placeholder="full-text search…" bind:value={fts} />
   <div class="scope" role="group" aria-label="Search scope">
     {#each SCOPES as [val, label, hint] (val)}
