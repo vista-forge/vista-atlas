@@ -39,6 +39,8 @@ export {
 } from './store/release.js';
 export { type ExtractOptions, extractTarGz, type TarEntry } from './store/tar.js';
 export { type ExpectedFile, sha256File, verifyFile, type VerifyResult } from './store/verify.js';
+export { childrenOf, facetDimensions, type LibraryNode } from './model/library.js';
+export { readingUriParts, sectionIdFromQuery, sectionMarkdown } from './model/reading.js';
 export {
   type DocumentDetail,
   type DocumentFacet,
@@ -47,6 +49,7 @@ export {
   escapeFtsQuery,
   facetCounts,
   getDocument,
+  getSection,
   joinChunkParts,
   listDocuments,
   listSections,
@@ -57,6 +60,7 @@ export {
   type SearchScope,
   type SectionRow,
   sectionText,
+  vocabLabels,
 } from './model/queries.js';
 export {
   buildDeepLink,

@@ -119,3 +119,45 @@ six months. Don't summarise diffs — the diff is the diff. Focus on
   a first-run progress UI — lands with the extension harness.
 - The extracted gold tree as the reading-pane body source (vs chunk
   reconstruction) — decide when the webview work starts.
+
+## 2026-07-05 — extension harness: library tree, search, interim reading surface
+
+**Done:**
+
+- package.json grew the extension identity (publisher vista-forge,
+  `main` → esbuild-bundled `dist/extension.cjs`, `engines.vscode ^1.125`,
+  contributes: explorer view + search/refresh/reload commands +
+  dataPath/docLimit settings); `make check` now also proves the bundle
+  builds. Dev deps: @types/vscode, @vscode/test-electron, vsce, esbuild.
+- Model layer first, TDD (the compass discipline — ext/ only builds
+  TreeItems): `library.ts` (facet dimensions → values with counts +
+  vocab labels → documents → sections), `reading.ts` (section as a
+  titled markdown page ending in its own `vdocs://section/<id>`
+  citation line — §3.5 citation discipline), `getSection`/`vocabLabels`
+  queries.
+- `ext/`: activation acquires the release (dataPath override for dev,
+  else `installDataRelease` into globalStorage with progress), opens
+  read-only, contract-checks (warns on mismatch), badges the view with
+  `data-v1 · <hash8>`. Library tree, FTS quick-pick search,
+  twin-link commands (`openSection`/`openDoc`/`search`/`pins`) and the
+  vscode:// URI handler routed through the contract's parseDeepLink.
+- **Interim reading surface decision:** sections render as virtual
+  markdown documents through VSCode's own preview — zero webview code,
+  zero sanitizer surface, and gold-body markdown is already
+  preview-friendly. The hydrating webview (tables/figures/boilerplate)
+  stays on the tracker as the real P2 reading pane; this makes Atlas
+  *usable* today.
+- In-host smoke (compass's run.ts/suite.ts pattern, installed VSCode,
+  settings → the verified dist/ staging copy): activation, a real
+  section renders with citation line, twin-link commands answer.
+  PASS on VSCode 1.125 / Node 24 host.
+
+**Smoke results:** 177 unit tests, statements 98.2%; `make check`
+(incl. bundle) green; `npm run test:vscode` PASS.
+
+**Deferred:**
+
+- `openEntity` handler — awaits entity queries (P4).
+- Hydrating reading-pane webview + the predecessor bug-class transforms
+  (mis-nested table placeholder, nav chrome, CAS image paths).
+- vsix packaging + GitHub release of the extension.

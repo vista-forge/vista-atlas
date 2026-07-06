@@ -9,11 +9,13 @@ import {
   escapeFtsQuery,
   facetCounts,
   getDocument,
+  getSection,
   joinChunkParts,
   listDocuments,
   listSections,
   searchChunks,
   sectionText,
+  vocabLabels,
 } from './queries.ts';
 
 const DOCS = [
@@ -89,7 +91,12 @@ describe('queries', () => {
   before(() => {
     dir = mkdtempSync(join(tmpdir(), 'atlas-queries-'));
     const path = join(dir, 'fixture.db');
-    buildFixtureDb(path, DOCS);
+    buildFixtureDb(path, DOCS, {
+      vocab: [
+        { kind: 'doc_type', code: 'UM', label: 'User Manual', description: 'End-user manual' },
+        { kind: 'doc_type', code: 'TM', label: 'Technical Manual', description: '' },
+      ],
+    });
     store = openStore(path);
   });
   after(() => {
@@ -179,6 +186,24 @@ describe('queries', () => {
         listSections(store, 'XU/xu_8_0_um').map((s) => s.slug),
         ['intro', 'menus'],
       );
+    });
+
+    it('fetches a single section by id', () => {
+      const section = getSection(store, 'XU/xu_8_0_um/menus');
+      assert.equal(section?.title, 'Menu Manager');
+      assert.equal(getSection(store, 'nope'), undefined);
+    });
+  });
+
+  describe('vocabLabels', () => {
+    it('maps codes to labels for a kind', () => {
+      const labels = vocabLabels(store, 'doc_type');
+      assert.equal(labels.get('UM'), 'User Manual');
+      assert.equal(labels.get('TM'), 'Technical Manual');
+    });
+
+    it('returns an empty map for an unknown kind', () => {
+      assert.equal(vocabLabels(store, 'nope').size, 0);
     });
   });
 

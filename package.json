@@ -1,9 +1,9 @@
 {
   "name": "vista-atlas",
   "version": "0.1.0",
-  "description": "Vista Atlas \u2014 VSCode extension over the vdocs gold-corpus data release: faceted library, FTS5 search, reading pane with table/figure hydration, entity pages. What the VA documentation SAYS.",
+  "description": "Vista Atlas — VSCode extension over the vdocs gold-corpus data release: faceted library, FTS5 search, reading pane with table/figure hydration, entity pages. What the VA documentation SAYS.",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/extension.cjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -13,11 +13,13 @@
   },
   "files": [
     "dist",
+    "contracts",
     "README.md",
     "LICENSE"
   ],
   "engines": {
-    "node": ">=24"
+    "node": ">=24",
+    "vscode": "^1.125.0"
   },
   "scripts": {
     "test": "node --import tsx --test 'src/**/*.test.ts'",
@@ -29,15 +31,24 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "audit": "npm audit --audit-level=high",
-    "check": "npm run lint && npm run typecheck && npm run test:cov && npm run audit",
-    "prepublishOnly": "npm run build"
+    "check": "npm run lint && npm run typecheck && npm run test:cov && npm run audit && npm run bundle",
+    "prepublishOnly": "npm run build",
+    "bundle": "esbuild src/ext/extension.ts --bundle --outfile=dist/extension.cjs --external:vscode --platform=node --format=cjs --sourcemap",
+    "bundle:smoke": "esbuild src/smoke/suite.ts --bundle --outfile=dist/smoke-suite.cjs --external:vscode --platform=node --format=cjs",
+    "test:vscode": "npm run bundle && npm run bundle:smoke && node --import tsx src/smoke/run.ts",
+    "vscode:prepublish": "npm run bundle",
+    "vsix": "vsce package --no-dependencies"
   },
   "license": "MIT",
   "author": "Rafael Richards",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^24.0.0",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-electron": "^3.0.0",
+    "@vscode/vsce": "^3.9.2",
     "c8": "^10.1.3",
+    "esbuild": "^0.28.1",
     "simple-git-hooks": "^2.11.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
@@ -49,5 +60,69 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/vista-forge/vista-atlas"
+  },
+  "displayName": "Vista Atlas",
+  "publisher": "vista-forge",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onUri"
+  ],
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "vistaAtlasLibrary",
+          "name": "VistA Docs",
+          "icon": "$(book)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "vistaAtlas.search",
+        "title": "Vista Atlas: Search the Documentation",
+        "icon": "$(search)"
+      },
+      {
+        "command": "vistaAtlas.refresh",
+        "title": "Vista Atlas: Refresh Library",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vistaAtlas.reloadData",
+        "title": "Vista Atlas: Reload Data (re-verify release)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "vistaAtlas.search",
+          "when": "view == 'vistaAtlasLibrary'",
+          "group": "navigation@1"
+        },
+        {
+          "command": "vistaAtlas.refresh",
+          "when": "view == 'vistaAtlasLibrary'",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Vista Atlas",
+      "properties": {
+        "vistaAtlas.dataPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a local directory containing index.db (an extracted release root, or the dist staging copy). Empty: fetch-verify the published release bundle into global storage."
+        },
+        "vistaAtlas.docLimit": {
+          "type": "number",
+          "default": 500,
+          "description": "Maximum documents listed under one facet value."
+        }
+      }
+    }
   }
 }

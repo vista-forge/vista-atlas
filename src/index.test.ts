@@ -35,6 +35,14 @@ describe('public API surface (atlas data layer)', () => {
     'joinChunkParts',
     'searchChunks',
     'escapeFtsQuery',
+    'getSection',
+    'vocabLabels',
+    // library tree + reading models
+    'childrenOf',
+    'facetDimensions',
+    'sectionMarkdown',
+    'readingUriParts',
+    'sectionIdFromQuery',
     // twin-link contract v1
     'loadTwinLinkContract',
     'validatePayload',

@@ -172,6 +172,39 @@ export function getDocument(store: Store, docKey: string): DocumentDetail | unde
   };
 }
 
+const toSection = (row: SqlRow): SectionRow => ({
+  section_id: str(row.section_id),
+  doc_key: str(row.doc_key),
+  slug: str(row.slug),
+  title: str(row.title),
+  level: num(row.level),
+  toc_level: num(row.toc_level),
+  kind: str(row.kind),
+  searchable: num(row.searchable),
+  section_path: str(row.section_path),
+  seq: num(row.seq),
+});
+
+/** Fetch one section by id, or undefined. */
+export function getSection(store: Store, sectionId: string): SectionRow | undefined {
+  const row = store.get(
+    `SELECT section_id, doc_key, slug, title, level, toc_level, kind, searchable,
+            section_path, seq
+     FROM v_sections WHERE section_id = ?`,
+    sectionId,
+  );
+  return row === undefined ? undefined : toSection(row);
+}
+
+/** code → label for a published vocabulary kind (doc_type, section, …). */
+export function vocabLabels(store: Store, kind: string): Map<string, string> {
+  return new Map(
+    store
+      .all('SELECT code, label FROM v_vocab WHERE kind = ?', kind)
+      .map((row) => [str(row.code), str(row.label)]),
+  );
+}
+
 /** The document's sections in reading (seq) order — the TOC. */
 export function listSections(store: Store, docKey: string): SectionRow[] {
   return store
@@ -181,18 +214,7 @@ export function listSections(store: Store, docKey: string): SectionRow[] {
        FROM v_sections WHERE doc_key = ? ORDER BY seq`,
       docKey,
     )
-    .map((row) => ({
-      section_id: str(row.section_id),
-      doc_key: str(row.doc_key),
-      slug: str(row.slug),
-      title: str(row.title),
-      level: num(row.level),
-      toc_level: num(row.toc_level),
-      kind: str(row.kind),
-      searchable: num(row.searchable),
-      section_path: str(row.section_path),
-      seq: num(row.seq),
-    }));
+    .map(toSection);
 }
 
 /**
