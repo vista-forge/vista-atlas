@@ -11,7 +11,9 @@ import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import * as vscode from 'vscode';
+import { getSection } from '../model/queries.js';
 import { type RunningNavigator, startNavigator } from '../server/http.js';
+import { navigatorLinkQuery, withLinkQuery } from '../server/link.js';
 import { installDataRelease } from '../store/bundle.js';
 import { checkIndexDb } from '../store/contract.js';
 import { type Store, openStore } from '../store/engine.js';
@@ -28,6 +30,14 @@ interface Session {
   readonly store: Store;
   readonly navigator: RunningNavigator;
   readonly panel: vscode.WebviewPanel;
+  /** asExternalUri base the iframe frames — deep-link queries merge onto it. */
+  readonly externalUrl: string;
+}
+
+/** A twin-link command invocation to land on in the navigator. */
+interface LinkIntent {
+  readonly command: string;
+  readonly payload: unknown;
 }
 let session: Session | null = null;
 let pins: { tag: string; corpus_content_hash: string } = { tag: '', corpus_content_hash: '' };
@@ -104,11 +114,34 @@ async function startSessionServer(
   return { store, navigator };
 }
 
-/** Open (or reveal) the navigator panel. Returns the server URL. */
-async function openNavigator(context: vscode.ExtensionContext): Promise<{ url: string }> {
+/** The deep-link query for an intent, '' when it can't be honored. */
+function linkQuery(store: Store, intent: LinkIntent | undefined): string {
+  if (intent === undefined) return '';
+  return navigatorLinkQuery(
+    intent.command,
+    intent.payload,
+    (sectionId) => getSection(store, sectionId)?.doc_key,
+  );
+}
+
+/**
+ * Open (or reveal) the navigator panel. An intent lands the SPA on its
+ * doc/section/search by reloading the iframe with the deep-link query.
+ * Returns the server URL and the URL the iframe was framed with (the
+ * observable deep-link seam — the in-host smoke asserts on it).
+ */
+async function openNavigator(
+  context: vscode.ExtensionContext,
+  intent?: LinkIntent,
+): Promise<{ url: string; framedUrl: string }> {
   if (session !== null) {
+    const query = linkQuery(session.store, intent);
+    const framedUrl = withLinkQuery(session.externalUrl, query);
+    if (query !== '') {
+      session.panel.webview.html = panelHtml(framedUrl);
+    }
     session.panel.reveal(vscode.ViewColumn.Active);
-    return { url: session.navigator.url };
+    return { url: session.navigator.url, framedUrl };
   }
   const { store, navigator } = await startSessionServer(context);
   const panel = vscode.window.createWebviewPanel(
@@ -123,7 +156,8 @@ async function openNavigator(context: vscode.ExtensionContext): Promise<{ url: s
       portMapping: [{ webviewPort: navigator.port, extensionHostPort: navigator.port }],
     },
   );
-  session = { store, navigator, panel };
+  const external = await vscode.env.asExternalUri(vscode.Uri.parse(navigator.url));
+  session = { store, navigator, panel, externalUrl: external.toString() };
 
   panel.onDidDispose(
     () => {
@@ -137,9 +171,9 @@ async function openNavigator(context: vscode.ExtensionContext): Promise<{ url: s
     context.subscriptions,
   );
 
-  const external = await vscode.env.asExternalUri(vscode.Uri.parse(navigator.url));
-  panel.webview.html = panelHtml(external.toString());
-  return { url: navigator.url };
+  const framedUrl = withLinkQuery(session.externalUrl, linkQuery(store, intent));
+  panel.webview.html = panelHtml(framedUrl);
+  return { url: navigator.url, framedUrl };
 }
 
 async function closeSession(): Promise<void> {
@@ -160,12 +194,18 @@ export function activate(context: vscode.ExtensionContext): void {
       await closeSession();
       await openNavigator(context);
     }),
-    // Twin-link contract v1 surface: the SPA owns navigation, so the
-    // cross-extension entries open the navigator (payload-targeted
-    // navigation lands with SPA deep-link support).
-    vscode.commands.registerCommand('vistaAtlas.search', () => openNavigator(context)),
-    vscode.commands.registerCommand('vistaAtlas.openDoc', () => openNavigator(context)),
-    vscode.commands.registerCommand('vistaAtlas.openSection', () => openNavigator(context)),
+    // Twin-link contract v1 surface: each command opens the navigator and,
+    // when the payload resolves, lands the SPA on it via the deep-link
+    // query (an unresolvable payload degrades to a plain open).
+    vscode.commands.registerCommand('vistaAtlas.search', (payload?: unknown) =>
+      openNavigator(context, { command: 'vistaAtlas.search', payload }),
+    ),
+    vscode.commands.registerCommand('vistaAtlas.openDoc', (payload?: unknown) =>
+      openNavigator(context, { command: 'vistaAtlas.openDoc', payload }),
+    ),
+    vscode.commands.registerCommand('vistaAtlas.openSection', (payload?: unknown) =>
+      openNavigator(context, { command: 'vistaAtlas.openSection', payload }),
+    ),
     vscode.commands.registerCommand('vistaAtlas.pins', () => pins),
     vscode.window.registerUriHandler({
       handleUri: async (uri) => {

@@ -27,5 +27,21 @@ metadata:
   deduped (the Go reference double-rendered it — our one deliberate
   improvement).
 - **UI changes** happen in the vendored Svelte source (`web/src/`), then
-  rebuild into `web/static/` (SvelteKit; `make web-build` not yet wired) —
-  never hand-edit the built assets.
+  `make web-build` into `web/static/` (wired 2026-07-06) — never hand-edit the
+  built assets. The build is **deterministic** (`kit.version.name` pinned in
+  `svelte.config.js` — the SvelteKit default is `Date.now()`, which dirties
+  every rebuild); an unchanged tree rebuilds byte-identically, so a dirty
+  `web/static` after web-build means the source really changed. `static/` is
+  the *output* here, so the SvelteKit assets-*input* dir is remapped to
+  `assets/` in `svelte.config.js` — don't put source static files in
+  `web/static/`.
+- **Deep-link grammar (Atlas addition, 2026-07-06):** the SPA reads initial
+  state from URL params — `?doc=<DocKey>`, `?section=<section_id>`, `?q=` +
+  `?scope=`, plus the five *displayed* facet axes (`web/src/lib/deeplink.ts`
+  ⟷ `src/server/link.ts`, kept aligned by their tests). Two invariants: the
+  `section` param deliberately shadows the API's undisplayed `section` facet
+  axis, and the SPA **ignores `?section` without `?doc`** — the extension
+  resolves section→doc via `getSection` before building the URL and reloads
+  the iframe (`withLinkQuery` preserves asExternalUri tunnel tokens). The
+  observable seam is the `framedUrl` the commands return; the in-host smoke
+  asserts on it.

@@ -44,4 +44,38 @@ export async function run(): Promise<void> {
   };
   assert.equal(pins.tag, 'data-v1');
   assert.equal(pins.corpus_content_hash.length, 64);
+
+  // Twin-link deep-link routing: a real section resolves to its doc and the
+  // iframe reloads with the SPA deep-link query; the shell still serves.
+  const docKey = docs[0]?.DocKey ?? '';
+  const toc = (await (
+    await fetch(`${opened.url}/api/doc/${encodeURIComponent(docKey)}/toc`)
+  ).json()) as { ID: string }[];
+  const sectionId = toc[0]?.ID ?? '';
+  assert.ok(sectionId !== '', `toc populated for ${docKey}`);
+  const linked = (await vscode.commands.executeCommand('vistaAtlas.openSection', {
+    section_id: sectionId,
+  })) as { framedUrl: string };
+  assert.ok(
+    linked.framedUrl.includes(`doc=${encodeURIComponent(docKey)}`) &&
+      linked.framedUrl.includes(`section=${encodeURIComponent(sectionId)}`),
+    `deep-link framed: ${linked.framedUrl}`,
+  );
+  const framed = await fetch(linked.framedUrl.replace(/^https?:\/\/[^/]+/, opened.url));
+  assert.equal(framed.status, 200, 'shell serves under a deep-link query');
+
+  const searched = (await vscode.commands.executeCommand('vistaAtlas.search', {
+    query: 'kaajee',
+    filters: { doc_type: ['TM'] },
+  })) as { framedUrl: string };
+  assert.ok(
+    searched.framedUrl.includes('q=kaajee') && searched.framedUrl.includes('doc_type=TM'),
+    `search framed: ${searched.framedUrl}`,
+  );
+
+  // An unresolvable payload degrades to a plain open, never an error.
+  const plain = (await vscode.commands.executeCommand('vistaAtlas.openSection', {
+    section_id: 'no-such-section',
+  })) as { framedUrl: string };
+  assert.ok(!plain.framedUrl.includes('section='), `plain open: ${plain.framedUrl}`);
 }

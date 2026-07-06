@@ -325,3 +325,7 @@ web-build wired: svelte.config.js retargeted to web/static (assets-input remappe
 ## 2026-07-06
 
 SPA deep-link support (Atlas addition; vdocs-web had no URL state): web/src/lib/deeplink.ts parses ?doc/?section/?q/?scope plus the five displayed facet axes (repeatable, API grammar) — TDD, 9 table cases; +page.svelte starts from that state, opens the linked doc (stub Doc, title upgraded when the result list names it) and section (TOC-matched for its title; falls back to open-by-ID). The section-ID param deliberately shadows the undisplayed 'section' facet axis.
+
+## 2026-07-06
+
+Twin-link payloads now land the SPA on their target: src/server/link.ts (TDD, 12 cases) maps openDoc/openSection/search payloads to the SPA deep-link query — openSection resolves section→doc via getSection (the SPA needs the doc for TOC context and ignores a bare section), unknown axes/ids/payloads degrade to a plain open; withLinkQuery merges onto the asExternalUri base without clobbering tunnel tokens. Extension commands pass payloads and reload the iframe; openNavigator returns framedUrl as the observable seam. Verified: make check green; in-host smoke (real VSCode, real data-v1) asserts a real section deep-links, search+filters frame, and an unresolvable payload plain-opens. openEntity still awaits P4 entity queries.

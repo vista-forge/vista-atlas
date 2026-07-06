@@ -179,6 +179,12 @@ describe('navigator http server', () => {
     assert.ok((await res.text()).includes('<title>nav</title>'));
   });
 
+  it('serves the shell for a deep-link query on /', async () => {
+    const res = await get('/?doc=xu%2Ftm&section=xu%2Ftm%23s-042');
+    assert.equal(res.status, 200);
+    assert.ok((await res.text()).includes('<title>nav</title>'));
+  });
+
   it('404s static traversal attempts', async () => {
     assert.equal((await get('/..%2F..%2Fetc%2Fpasswd')).status, 404);
   });
