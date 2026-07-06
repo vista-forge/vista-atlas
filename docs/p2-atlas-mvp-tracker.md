@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # P2 — Atlas MVP tracker
 
 Governing design: `vista-meta/docs/proposals/vista-atlas-and-compass-de-novo.md`
