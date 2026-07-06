@@ -156,6 +156,7 @@ async function openNavigator(
       portMapping: [{ webviewPort: navigator.port, extensionHostPort: navigator.port }],
     },
   );
+  panel.iconPath = vscode.Uri.file(context.asAbsolutePath('media/icon.png'));
   const external = await vscode.env.asExternalUri(vscode.Uri.parse(navigator.url));
   session = { store, navigator, panel, externalUrl: external.toString() };
 

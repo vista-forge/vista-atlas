@@ -329,3 +329,7 @@ SPA deep-link support (Atlas addition; vdocs-web had no URL state): web/src/lib/
 ## 2026-07-06
 
 Twin-link payloads now land the SPA on their target: src/server/link.ts (TDD, 12 cases) maps openDoc/openSection/search payloads to the SPA deep-link query — openSection resolves section→doc via getSection (the SPA needs the doc for TOC context and ignores a bare section), unknown axes/ids/payloads degrade to a plain open; withLinkQuery merges onto the asExternalUri base without clobbering tunnel tokens. Extension commands pass payloads and reload the iframe; openNavigator returns framedUrl as the observable seam. Verified: make check green; in-host smoke (real VSCode, real data-v1) asserts a real section deep-links, search+filters frame, and an unresolvable payload plain-opens. openEntity still awaits P4 entity queries.
+
+## 2026-07-06
+
+extension icon: media/icon.svg (open-atlas + plotted-route motif, navy/gold — the twin distinction from vista-compass) rendered to media/icon.png (256px, inkscape); package.json icon field + .vscodeignore whitelist so the Extensions view and vsix listing show it; the navigator panel tab gets the same icon via panel.iconPath. vsix re-packaged and verified (24 files).

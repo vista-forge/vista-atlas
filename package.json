@@ -57,6 +57,7 @@
   },
   "displayName": "Vista Atlas",
   "publisher": "vista-forge",
+  "icon": "media/icon.png",
   "categories": [
     "Other"
   ],

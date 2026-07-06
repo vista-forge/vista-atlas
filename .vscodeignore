@@ -3,6 +3,7 @@
 !dist/extension.cjs
 !contracts/**
 !web/static/**
+!media/icon.png
 !README.md
 !LICENSE
 !package.json
