@@ -5,11 +5,15 @@ documentation *says*.** The de-novo successor of vdocs-web (and, with its twin, 
 [vista-compass](https://github.com/vista-forge/vista-compass) (what the system
 measurably *is*); the two cross-link through the vdocs↔vista-meta entity bridge.
 
-> **Status: scaffold (2026-07-05).** The governing design is the proposal
+> **Status: P2 data layer landed (2026-07-05).** The governing design is the proposal
 > [`vista-atlas-and-compass-de-novo.md`](https://github.com/rafael5/vista-meta/blob/main/docs/proposals/vista-atlas-and-compass-de-novo.md)
-> (in vista-meta's docs). P0 (engine spike) is done — **`node:sqlite`** in the
-> extension host (VSCode ≥ 1.125, Node 24), zero native dependencies. Next: P1
-> shared store, P2 Atlas MVP.
+> (in vista-meta's docs). P0 (engine spike) done — **`node:sqlite`** in the
+> extension host (VSCode ≥ 1.125, Node 24), zero native dependencies. P1 shared
+> store consumed (byte-identical with vista-compass's, pending vista-store
+> extraction); data-v1 release pinned, contract-checked, and queryable
+> (facets / TOC / section bodies / scoped FTS5). Next: bundle fetch+extract,
+> extension harness, reading pane — see
+> [`docs/p2-atlas-mvp-tracker.md`](docs/p2-atlas-mvp-tracker.md).
 
 ## What it will do
 

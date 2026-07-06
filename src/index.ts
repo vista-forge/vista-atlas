@@ -1,26 +1,63 @@
 /**
- * myproject — replace this comment with a one-line package summary.
+ * vista-atlas — VSCode extension over the vdocs gold-corpus data
+ * release (index.db + gold tree): what the VA documentation SAYS.
  *
- * Library entry point. Re-export the public API; keep implementation
- * in sibling modules so consumers can tree-shake what they don't use.
+ * This package root exports the Atlas data layer: the shared
+ * vista-store modules (kept byte-identical with vista-compass's until
+ * the lib extracts to a sibling repo), the index.db contract check,
+ * the query layer, and the twin-link contract v1 seam.
  */
 
-export interface GreetOptions {
-  /** Honorific to prepend (e.g. "Dr."). Optional. */
-  readonly title?: string;
-}
-
-/**
- * Build a greeting for a given name.
- *
- * The function is intentionally trivial — it exists to demonstrate the
- * test idiom (table-driven, `node:test`, type-safe options object) so
- * a new clone of this template has something green to start from.
- */
-export function greet(name: string, options: GreetOptions = {}): string {
-  if (name.length === 0) {
-    throw new Error('greet: name must not be empty');
-  }
-  const prefix = options.title ? `${options.title} ` : '';
-  return `Hello, ${prefix}${name}!`;
-}
+export {
+  checkIndexDb,
+  type ContractReport,
+  INDEX_DB_FTS,
+  INDEX_DB_VIEWS,
+  type IndexContractExpectation,
+} from './store/contract.js';
+export { openStore, type SqlRow, type SqlValue, type Store } from './store/engine.js';
+export {
+  ensureAsset,
+  type EnsureAssetOptions,
+  type EnsureAssetResult,
+} from './store/fetch.js';
+export {
+  assetUrl,
+  loadReleaseRecord,
+  parseReleaseRecord,
+  type ReleaseRecord,
+} from './store/release.js';
+export { type ExpectedFile, sha256File, verifyFile, type VerifyResult } from './store/verify.js';
+export {
+  type DocumentDetail,
+  type DocumentFacet,
+  type DocumentFilters,
+  type DocumentSummary,
+  escapeFtsQuery,
+  facetCounts,
+  getDocument,
+  joinChunkParts,
+  listDocuments,
+  listSections,
+  type Page,
+  searchChunks,
+  type SearchHit,
+  type SearchOptions,
+  type SearchScope,
+  type SectionRow,
+  sectionText,
+} from './model/queries.js';
+export {
+  buildDeepLink,
+  type Citation,
+  type CommandSpec,
+  loadTwinLinkContract,
+  type ParamSpec,
+  parseCitation,
+  parseDeepLink,
+  type ParsedDeepLink,
+  type Target,
+  type TwinLinkContract,
+  validatePayload,
+  type ValidationResult,
+} from './twinlink.js';

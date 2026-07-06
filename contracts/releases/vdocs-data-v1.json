@@ -1,0 +1,16 @@
+{
+  "comment": "Pinned release record for the vdocs data-v1 release. Atlas fetch-verifies these published artifacts and never re-derives them (proposal §3.1). Unlike vista-meta, the db is not a standalone asset: index.db + the gold tree ship inside vdocs-data-v1.tar.gz; the producer manifest (itself sha-pinned here) carries the per-file sha256s used to verify the extracted contents. Shas copied from the data-v1 release's SHA256SUMS; update only by re-pinning against a new published release.",
+  "repo": "rafael5/vdocs",
+  "tag": "data-v1",
+  "content_hash": "3ce0872e32ec3187eabcee703165134710cc6b92f8c897f149575ddd6ffa01ad",
+  "files": {
+    "vdocs-data-v1.tar.gz": {
+      "bytes": 102862708,
+      "sha256": "56e6bd68c367eea57bc283c98ff068809169885e746e483e3d362673019d71a4"
+    },
+    "vdocs-data-v1.manifest.json": {
+      "bytes": 3310,
+      "sha256": "96ec4d4ccfe62c16d35b6f39455ce9bab67d0e252ea39ef1af93d8186be5d878"
+    }
+  }
+}
