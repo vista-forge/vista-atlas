@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 84 168 126" width="168" height="126">
+  <!-- Vista Atlas header logo: the blue open book from media/icon.svg on a
+       transparent ground (no white plate / VISTA lettering — illegible at
+       header size). Same #0262E7 as the vista-compass twin. Copied verbatim
+       into the SPA build by SvelteKit (web/assets → /logo.svg). -->
+  <g stroke="#0262E7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 108 C110 94 82 90 54 96 L54 186 C82 180 110 184 128 198
+             C146 184 174 180 202 186 L202 96 C174 90 146 94 128 108 Z"
+          fill="none"/>
+    <line x1="128" y1="108" x2="128" y2="198"/>
+  </g>
+  <g stroke="#0262E7" stroke-width="9" stroke-linecap="round" fill="none">
+    <line x1="74" y1="122" x2="106" y2="118"/>
+    <line x1="74" y1="144" x2="106" y2="140"/>
+    <line x1="74" y1="166" x2="96" y2="163"/>
+    <line x1="150" y1="118" x2="182" y2="122"/>
+    <line x1="150" y1="140" x2="182" y2="144"/>
+    <line x1="160" y1="163" x2="182" y2="166"/>
+  </g>
+</svg>

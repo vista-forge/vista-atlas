@@ -353,7 +353,7 @@
 </script>
 
 <header>
-  <h1>vdocs</h1>
+  <h1 class="brand"><img class="logo" src="/logo.svg" alt="Vista Atlas" /></h1>
   <input class="fts" placeholder="full-text search…" bind:value={fts} />
   <div class="scope" role="group" aria-label="Search scope">
     {#each SCOPES as [val, label, hint] (val)}
@@ -566,6 +566,15 @@
   h1 {
     font-size: 1rem;
     margin: 0;
+  }
+  .brand {
+    align-self: center;
+    display: flex;
+  }
+  .logo {
+    height: 1.5rem;
+    width: auto;
+    display: block;
   }
   .fts {
     flex: 1;

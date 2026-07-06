@@ -337,3 +337,7 @@ extension icon: media/icon.svg (open-atlas + plotted-route motif, navy/gold — 
 ## 2026-07-06
 
 icon redesigned to match the vista-compass twin's logo language: blue open book, flat single-color line art in the compass's sampled #0262E7 on white, VISTA lettering — replaces the navy/gold route motif. Same files (media/icon.svg source, icon.png shipped); vsix repackaged.
+
+## 2026-07-06
+
+SPA header brands as Atlas: the 'vdocs' wordmark is replaced by the blue-book logo (web/assets/logo.svg — the icon's book on transparent ground, since the white plate + VISTA lettering don't survive 1.5rem; web/assets is the remapped SvelteKit assets-input dir, copied verbatim to /logo.svg in the build). Verified: svelte-check green, /logo.svg serves 200 image/svg+xml from the navigator, legible on light + dark; vsix now 25 files.
