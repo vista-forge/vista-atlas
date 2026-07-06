@@ -341,3 +341,7 @@ icon redesigned to match the vista-compass twin's logo language: blue open book,
 ## 2026-07-06
 
 SPA header brands as Atlas: the 'vdocs' wordmark is replaced by the blue-book logo (web/assets/logo.svg — the icon's book on transparent ground, since the white plate + VISTA lettering don't survive 1.5rem; web/assets is the remapped SvelteKit assets-input dir, copied verbatim to /logo.svg in the build). Verified: svelte-check green, /logo.svg serves 200 image/svg+xml from the navigator, legible on light + dark; vsix now 25 files.
+
+## 2026-07-06
+
+README rewritten as a user-facing extension introduction: what Atlas is, who it serves (VistA developers/users), full feature list (faceted library, FTS scopes, reading pane with inline extracted tables, deep links + cross-extension commands, verified read-only local data), commands + settings tables. Development history, org jargon, and status/tracker prose dropped (that context lives in docs/ and the changelog). Corpus claims checked against data-v1 (1,034 docs, 109 apps).
