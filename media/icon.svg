@@ -1,44 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <!-- Vista Atlas extension icon: an open atlas (book of maps) with a plotted
-       route — the documentation-navigator twin of vista-compass. Source of
-       truth for media/icon.png (render: inkscape icon.svg -o icon.png). -->
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1b3a6b"/>
-      <stop offset="1" stop-color="#112e51"/>
-    </linearGradient>
-  </defs>
-  <rect width="256" height="256" rx="48" fill="url(#bg)"/>
+  <!-- Vista Atlas extension icon: a blue open book (atlas) on white, in the
+       same flat single-blue line-art style + #0262E7 blue as the vista-compass
+       twin's logo. Source of truth for media/icon.png
+       (render: inkscape icon.svg -o icon.png). -->
+  <rect width="256" height="256" fill="#ffffff"/>
 
-  <!-- open book -->
-  <g>
-    <!-- left page -->
-    <path d="M126 74 C106 60 76 56 48 62 L48 182 C76 176 106 180 126 194 Z"
-          fill="#f5f7fa"/>
-    <!-- right page -->
-    <path d="M130 74 C150 60 180 56 208 62 L208 182 C180 176 150 180 130 194 Z"
-          fill="#e8edf4"/>
-    <!-- spine shadow -->
-    <path d="M126 74 L126 194 L130 194 L130 74 Z" fill="#c3cdd9"/>
+  <text x="128" y="72" text-anchor="middle"
+        font-family="DejaVu Sans, Arial, sans-serif" font-weight="bold"
+        font-size="30" letter-spacing="3" fill="#0262E7">VISTA</text>
+
+  <!-- open book, bold line art -->
+  <g stroke="#0262E7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <!-- covers/pages outline -->
+    <path d="M128 108 C110 94 82 90 54 96 L54 186 C82 180 110 184 128 198
+             C146 184 174 180 202 186 L202 96 C174 90 146 94 128 108 Z"
+          fill="#ffffff"/>
+    <!-- spine -->
+    <line x1="128" y1="108" x2="128" y2="198"/>
   </g>
 
-  <!-- text lines on the left page -->
-  <g stroke="#8a9bb0" stroke-width="7" stroke-linecap="round">
-    <line x1="62" y1="88"  x2="112" y2="82"/>
-    <line x1="62" y1="108" x2="112" y2="102"/>
-    <line x1="62" y1="128" x2="112" y2="122"/>
-    <line x1="62" y1="148" x2="100" y2="143"/>
-  </g>
-
-  <!-- plotted route on the right page -->
-  <g fill="none" stroke="#fdb81e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M148 160 C160 138 152 122 168 108 C180 96 188 92 194 84"/>
-  </g>
-  <circle cx="148" cy="160" r="9" fill="#fdb81e"/>
-  <!-- destination pin -->
-  <g>
-    <path d="M194 62 C183 62 176 70 176 80 C176 92 194 108 194 108 C194 108 212 92 212 80 C212 70 205 62 194 62 Z"
-          fill="#e31c3d"/>
-    <circle cx="194" cy="80" r="7" fill="#ffffff"/>
+  <!-- page text lines, echoing the compass's tick marks -->
+  <g stroke="#0262E7" stroke-width="9" stroke-linecap="round" fill="none">
+    <line x1="74" y1="122" x2="106" y2="118"/>
+    <line x1="74" y1="144" x2="106" y2="140"/>
+    <line x1="74" y1="166" x2="96" y2="163"/>
+    <line x1="150" y1="118" x2="182" y2="122"/>
+    <line x1="150" y1="140" x2="182" y2="144"/>
+    <line x1="160" y1="163" x2="182" y2="166"/>
   </g>
 </svg>

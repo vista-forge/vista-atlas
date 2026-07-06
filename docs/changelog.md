@@ -333,3 +333,7 @@ Twin-link payloads now land the SPA on their target: src/server/link.ts (TDD, 12
 ## 2026-07-06
 
 extension icon: media/icon.svg (open-atlas + plotted-route motif, navy/gold — the twin distinction from vista-compass) rendered to media/icon.png (256px, inkscape); package.json icon field + .vscodeignore whitelist so the Extensions view and vsix listing show it; the navigator panel tab gets the same icon via panel.iconPath. vsix re-packaged and verified (24 files).
+
+## 2026-07-06
+
+icon redesigned to match the vista-compass twin's logo language: blue open book, flat single-color line art in the compass's sampled #0262E7 on white, VISTA lettering — replaces the navy/gold route motif. Same files (media/icon.svg source, icon.png shipped); vsix repackaged.
