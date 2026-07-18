@@ -36,7 +36,7 @@ typecheck:
 audit:
 	$(NPM) run audit
 
-check: lint typecheck test-cov audit
+check: lint typecheck test-cov audit web-audit
 
 build:
 	$(NPM) run build
@@ -62,6 +62,12 @@ web-test:
 
 web-check:
 	cd web && $(NPM) run check
+
+# The web sublockfile was invisible to the root `audit` (de-GitHub review F8:
+# dompurify/cookie advisories sat ungated). Converts to offline osv-scanner
+# with the org-wide vuln-gate rollout.
+web-audit:
+	cd web && $(NPM) audit
 
 # Append a dated entry to docs/changelog.md.
 # Usage: make log MSG="what changed and why"
