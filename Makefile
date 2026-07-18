@@ -3,7 +3,7 @@
 NPM := npm
 BIN := ./node_modules/.bin
 
-.PHONY: install hooks test test-watch test-cov lint format fix typecheck audit check build run clean push pull log web-install web-build web-test web-check
+.PHONY: install hooks test test-watch test-cov lint format fix typecheck audit check build run clean push pull log web-install web-build web-test web-check vuln
 
 install:
 	$(NPM) install
@@ -33,10 +33,15 @@ fix:
 typecheck:
 	$(NPM) run typecheck
 
-audit:
-	$(NPM) run audit
+# audit is an alias for vuln (kept for muscle memory / CLAUDE.md). The gate is
+# the OFFLINE shared scan — covers root AND web lockfiles in one pass
+# (de-GitHub OPTION A; npm audit's registry call is gone from gate time).
+audit: vuln
 
-check: lint typecheck test-cov audit web-audit
+vuln:
+	bash ../.github/scripts/vuln-scan.sh .
+
+check: lint typecheck test-cov vuln
 
 build:
 	$(NPM) run build
@@ -63,11 +68,7 @@ web-test:
 web-check:
 	cd web && $(NPM) run check
 
-# The web sublockfile was invisible to the root `audit` (de-GitHub review F8:
-# dompurify/cookie advisories sat ungated). Converts to offline osv-scanner
-# with the org-wide vuln-gate rollout.
-web-audit:
-	cd web && $(NPM) audit
+
 
 # Append a dated entry to docs/changelog.md.
 # Usage: make log MSG="what changed and why"
