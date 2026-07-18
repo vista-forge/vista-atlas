@@ -15,7 +15,6 @@ coverage/
 npm-debug.log*
 
 # Editors
-.vscode/
 .idea/
 *.swp
 .DS_Store
