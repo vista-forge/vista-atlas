@@ -345,3 +345,7 @@ SPA header brands as Atlas: the 'vdocs' wordmark is replaced by the blue-book lo
 ## 2026-07-06
 
 README rewritten as a user-facing extension introduction: what Atlas is, who it serves (VistA developers/users), full feature list (faceted library, FTS scopes, reading pane with inline extracted tables, deep links + cross-extension commands, verified read-only local data), commands + settings tables. Development history, org jargon, and status/tracker prose dropped (that context lives in docs/ and the changelog). Corpus claims checked against data-v1 (1,034 docs, 109 apps).
+
+## 2026-07-18
+
+F8 vuln triage: dompurify+cookie cleared (kit 2.70, cookie 0.7.2 override), SPA rebuilt, web-audit joined check. CORRECTION to d42c683's message: the 'pre-existing test-cov red' was NOT a repo defect — it was the invoking shell on system Node 18 (no direnv; Node 18 --test lacks glob args). Under the repo env (direnv, Node 24) test-cov and full check are green on HEAD.
